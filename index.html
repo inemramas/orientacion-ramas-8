@@ -100,8 +100,8 @@
       <div class="flex items-center gap-2 sm:gap-3">
         <!-- Indicador de estado de sincronización -->
         <span id="syncStatusBadge" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
-          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-          Modo Local Activo
+          <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
+          Nube Supabase Conectada
         </span>
 
         <!-- Botón de acceso docente -->
@@ -704,7 +704,7 @@
         <div id="comparisonChartContainer" class="space-y-3.5"></div>
       </div>
 
-      <!-- Carga de Excel y Configuración Cloud (Supabase opcional) -->
+      <!-- Carga de Excel y Configuración Cloud (Supabase) -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <!-- Importar Base de Datos Excel -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
@@ -739,22 +739,22 @@
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3">
           <h3 class="text-base font-bold text-white flex items-center gap-2">
             <i data-lucide="database" class="w-5 h-5 text-sky-400"></i>
-            Sincronización Multi-Equipo (Supabase Opcional)
+            Sincronización Multi-Equipo (Supabase Conectado)
           </h3>
           <p class="text-xs text-slate-400">
-            Si aplicas el test en varios computadores simultáneamente, conecta tu proyecto gratuito de Supabase. Si lo dejas vacío, funciona 100% en este navegador.
+            Tu proyecto de Supabase ya está vinculado por defecto en el código para centralizar los registros de todos los computadores en tiempo real.
           </p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <input
               type="text"
               id="inputSupabaseUrl"
-              placeholder="https://lkilxokkssrgbeldozik.supabase.co/rest/v1/"
+              placeholder="Supabase URL (https://xxx.supabase.co)"
               class="px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
             />
             <input
               type="password"
               id="inputSupabaseKey"
-              placeholder="Supabase Anon Public Key"
+              placeholder="Supabase Publishable / Anon Key"
               class="px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
             />
           </div>
@@ -951,6 +951,14 @@
   <!-- ===================================================================== -->
   <script>
     /**
+     * CREDENCIALES POR DEFECTO DE SUPABASE (PRECONFIGURADAS)
+     */
+    const DEFAULT_SUPABASE_CONFIG = {
+      url: 'https://lkilxokkssrgbeldozik.supabase.co',
+      key: 'sb_publishable_nea9uD_FTcbxTF7mBkRA0Q_ipYnBfRF'
+    };
+
+    /**
      * BANCO OFICIAL DE 27 AFIRMACIONES (Instrumento 1 - Test de Intereses)
      * - 6 preguntas por Rama (Agropecuaria, Comercial, Industrial, Promoción Social)
      * - 3 preguntas de Control de Atención (Ítems 9, 18 y 27)
@@ -999,8 +1007,8 @@
       settings: {
         pin: '1234',
         maxQuota: 35,
-        supabaseUrl: '',
-        supabaseKey: ''
+        supabaseUrl: DEFAULT_SUPABASE_CONFIG.url,
+        supabaseKey: DEFAULT_SUPABASE_CONFIG.key
       },
       currentStudent: null,
       shuffledQuestions: [],
@@ -1015,6 +1023,14 @@
     // =========================================================================
     // UTILIDADES DE NORMALIZACIÓN Y PERSISTENCIA (LOCALSTORAGE + SUPABASE)
     // =========================================================================
+
+    function normalizeSupabaseBaseUrl(rawUrl) {
+      if (!rawUrl) return '';
+      return String(rawUrl)
+        .trim()
+        .replace(/\/rest\/v1\/?$/i, '')
+        .replace(/\/$/, '');
+    }
 
     function escapeHtml(str) {
       if (str === null || str === undefined) return '';
@@ -1091,7 +1107,7 @@
       };
     }
 
-    function loadState() {
+    async function loadState() {
       try {
         const savedStudents = localStorage.getItem(STORAGE_KEYS.STUDENTS);
         const savedResults = localStorage.getItem(STORAGE_KEYS.RESULTS);
@@ -1099,12 +1115,23 @@
 
         if (savedStudents) AppState.students = JSON.parse(savedStudents);
         if (savedResults) AppState.results = JSON.parse(savedResults);
-        if (savedSettings) AppState.settings = { ...AppState.settings, ...JSON.parse(savedSettings) };
+        if (savedSettings) {
+          const parsed = JSON.parse(savedSettings);
+          AppState.settings = {
+            ...AppState.settings,
+            ...parsed,
+            supabaseUrl: normalizeSupabaseBaseUrl(parsed.supabaseUrl) || DEFAULT_SUPABASE_CONFIG.url,
+            supabaseKey: (parsed.supabaseKey && parsed.supabaseKey.trim()) ? parsed.supabaseKey.trim() : DEFAULT_SUPABASE_CONFIG.key
+          };
+        }
       } catch (err) {
         console.error('Error al cargar estado local:', err);
       }
 
-      // Cargar datos de demostración iniciales si la base está vacía para probar inmediatamente
+      // Intentar traer la base actualizada desde Supabase al iniciar
+      await pullFromSupabaseIfConfigured();
+
+      // Cargar datos de demostración iniciales solo si tanto local como Supabase están vacíos
       if (!AppState.students || AppState.students.length === 0) {
         AppState.students = [
           { Numero_Identidad: '1001', Nombre_Completo: 'Valentina Gómez Pérez', Grado: '8°', Sección: '8°-1' },
@@ -1112,7 +1139,7 @@
           { Numero_Identidad: '1003', Nombre_Completo: 'Camila Andrea Torres', Grado: '8°', Sección: '8°-3' },
           { Numero_Identidad: '1004', Nombre_Completo: 'Juan David Herrera', Grado: '8°', Sección: '8°-4' }
         ];
-        saveStudents();
+        localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(AppState.students));
       }
 
       updateSyncBadge();
@@ -1128,6 +1155,7 @@
     }
 
     function saveSettings() {
+      AppState.settings.supabaseUrl = normalizeSupabaseBaseUrl(AppState.settings.supabaseUrl);
       localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(AppState.settings));
       updateSyncBadge();
     }
@@ -1141,13 +1169,24 @@
       }
     }
 
-    // Sincronización opcional con Supabase REST API (tabla: orientacion_ramas)
+    // Sincronización con Supabase REST API (tabla: orientacion_ramas)
     async function syncResultToSupabase(docId, payload) {
-      const { supabaseUrl, supabaseKey } = AppState.settings;
-      if (!supabaseUrl || !supabaseKey) return;
+      const cleanUrl = normalizeSupabaseBaseUrl(AppState.settings.supabaseUrl);
+      const { supabaseKey } = AppState.settings;
+      if (!cleanUrl || !supabaseKey) return;
 
       try {
-        const cleanUrl = supabaseUrl.replace(/\/$/, '');
+        if (payload === null) {
+          await fetch(`${cleanUrl}/rest/v1/orientacion_ramas?numero_identidad=eq.${encodeURIComponent(docId)}`, {
+            method: 'DELETE',
+            headers: {
+              'apikey': supabaseKey,
+              'Authorization': `Bearer ${supabaseKey}`
+            }
+          });
+          return;
+        }
+
         await fetch(`${cleanUrl}/rest/v1/orientacion_ramas`, {
           method: 'POST',
           headers: {
@@ -1168,10 +1207,10 @@
     }
 
     async function syncStudentsToSupabase() {
-      const { supabaseUrl, supabaseKey } = AppState.settings;
-      if (!supabaseUrl || !supabaseKey) return;
+      const cleanUrl = normalizeSupabaseBaseUrl(AppState.settings.supabaseUrl);
+      const { supabaseKey } = AppState.settings;
+      if (!cleanUrl || !supabaseKey) return;
       try {
-        const cleanUrl = supabaseUrl.replace(/\/$/, '');
         await fetch(`${cleanUrl}/rest/v1/orientacion_estudiantes`, {
           method: 'POST',
           headers: {
@@ -1195,10 +1234,10 @@
     }
 
     async function pullFromSupabaseIfConfigured() {
-      const { supabaseUrl, supabaseKey } = AppState.settings;
-      if (!supabaseUrl || !supabaseKey) return;
+      const cleanUrl = normalizeSupabaseBaseUrl(AppState.settings.supabaseUrl);
+      const { supabaseKey } = AppState.settings;
+      if (!cleanUrl || !supabaseKey) return;
       try {
-        const cleanUrl = supabaseUrl.replace(/\/$/, '');
         const headers = {
           'apikey': supabaseKey,
           'Authorization': `Bearer ${supabaseKey}`
@@ -1753,7 +1792,7 @@
 
     // Guardar configuración (Supabase y PIN)
     document.getElementById('btnSaveSettings').addEventListener('click', async () => {
-      const url = document.getElementById('inputSupabaseUrl').value.trim();
+      const url = normalizeSupabaseBaseUrl(document.getElementById('inputSupabaseUrl').value);
       const key = document.getElementById('inputSupabaseKey').value.trim();
       const newPin = document.getElementById('inputNewPin').value.trim();
 
@@ -1769,7 +1808,7 @@
         await pullFromSupabaseIfConfigured();
         renderAdminDashboard();
       }
-      showToast('Configuración guardada correctamente.', 'success');
+      showToast('Configuración guardada y sincronizada correctamente.', 'success');
     });
 
     // Descargar plantilla Excel de ejemplo con los encabezados exactos del usuario
@@ -2449,8 +2488,8 @@
     });
 
     // Inicialización al cargar la página
-    window.addEventListener('DOMContentLoaded', () => {
-      loadState();
+    window.addEventListener('DOMContentLoaded', async () => {
+      await loadState();
       lucide.createIcons();
     });
   </script>
