@@ -120,7 +120,7 @@
   <!-- Contenedor principal -->
   <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-10">
 
-    <!-- Alerta / Notificación flotante (reemplazo elegante de alert/confirm) -->
+    <!-- Alerta / Notificación flotante -->
     <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-md w-full pointer-events-none px-4 sm:px-0"></div>
 
     <!-- ===================================================================== -->
@@ -161,6 +161,7 @@
 
           <button
             type="submit"
+            id="btnSubmitLogin"
             class="w-full py-3.5 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-semibold text-sm sm:text-base shadow-lg shadow-emerald-950/60 transition flex items-center justify-center gap-2 cursor-pointer"
           >
             <span>Verificar Identidad y Continuar</span>
@@ -531,6 +532,16 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2.5">
+          <button
+            type="button"
+            id="btnSyncNow"
+            class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 text-xs sm:text-sm font-semibold transition inline-flex items-center gap-2 cursor-pointer"
+            title="Descargar cambios recientes desde Supabase"
+          >
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            <span>Actualizar Nube</span>
+          </button>
+
           <label
             for="inputMergeExcel"
             class="px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-sky-950/50 transition inline-flex items-center gap-2 cursor-pointer"
@@ -730,7 +741,7 @@
           <label class="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-slate-700 hover:border-emerald-500/60 rounded-xl bg-slate-950/60 cursor-pointer transition p-4 text-center">
             <i data-lucide="file-plus-2" class="w-7 h-7 text-slate-400 mb-1.5"></i>
             <span class="text-xs sm:text-sm font-medium text-slate-200">Haz clic para seleccionar tu archivo Excel (.xlsx, .xls, .csv)</span>
-            <span class="text-[11px] text-slate-500 mt-0.5">Se actualizarán los estudiantes sin borrar respuestas ya registradas</span>
+            <span class="text-[11px] text-slate-500 mt-0.5">Se sincronizará automáticamente con Supabase para todos los dispositivos</span>
             <input type="file" id="inputExcelFile" accept=".xlsx,.xls,.csv" class="hidden" />
           </label>
         </div>
@@ -742,7 +753,7 @@
             Sincronización Multi-Equipo (Supabase Conectado)
           </h3>
           <p class="text-xs text-slate-400">
-            Tu proyecto de Supabase ya está vinculado por defecto en el código para centralizar los registros de todos los computadores en tiempo real.
+            El PIN docente, cupos y estudiantes se sincronizan en la nube para que funcionen igual en cualquier computador o celular.
           </p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <input
@@ -859,7 +870,7 @@
         </button>
       </div>
       <p class="text-xs text-slate-400 mb-4">
-        Ingresa el PIN administrativo para gestionar la base de datos y ver los resultados del test (PIN por defecto: <strong class="text-slate-200">1234</strong>).
+        Ingresa el PIN administrativo para gestionar la base de datos y ver los resultados del test (PIN inicial por defecto: <strong class="text-slate-200">1234</strong>).
       </p>
       <form id="formPin" class="space-y-3">
         <input
@@ -873,6 +884,7 @@
         <p id="pinErrorMsg" class="hidden text-xs text-rose-400 text-center">PIN incorrecto. Intenta nuevamente.</p>
         <button
           type="submit"
+          id="btnSubmitPin"
           class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition cursor-pointer"
         >
           Ingresar al Panel
@@ -881,7 +893,7 @@
     </div>
   </div>
 
-  <!-- Modal Confirmación Personalizada (reemplaza window.confirm) -->
+  <!-- Modal Confirmación Personalizada -->
   <div id="modalConfirm" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4">
       <h3 id="confirmTitle" class="text-base font-bold text-white">Confirmar acción</h3>
@@ -960,8 +972,6 @@
 
     /**
      * BANCO OFICIAL DE 27 AFIRMACIONES (Instrumento 1 - Test de Intereses)
-     * - 6 preguntas por Rama (Agropecuaria, Comercial, Industrial, Promoción Social)
-     * - 3 preguntas de Control de Atención (Ítems 9, 18 y 27)
      */
     const QUESTIONS_BANK = [
       { id: 1, rama: 'Agropecuaria', text: 'Me gusta cuidar animales (vacas, cerdos, gallinas, búfalos).' },
@@ -1003,7 +1013,7 @@
     // Estado global de la aplicación
     const AppState = {
       students: [],
-      results: {}, // Indexado por Numero_Identidad limpio
+      results: {},
       settings: {
         pin: '1234',
         maxQuota: 35,
@@ -1082,7 +1092,7 @@
         el.style.opacity = '0';
         el.style.transform = 'translateY(8px)';
         setTimeout(() => el.remove(), 300);
-      }, 4200);
+      }, 4500);
     }
 
     function openConfirmModal(title, message, onConfirm) {
@@ -1128,7 +1138,7 @@
         console.error('Error al cargar estado local:', err);
       }
 
-      // Intentar traer la base actualizada desde Supabase al iniciar
+      // Descargar configuración, estudiantes y resultados desde Supabase al iniciar
       await pullFromSupabaseIfConfigured();
 
       // Cargar datos de demostración iniciales solo si tanto local como Supabase están vacíos
@@ -1145,27 +1155,67 @@
       updateSyncBadge();
     }
 
-    function saveStudents() {
+    async function saveStudents() {
       localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(AppState.students));
-      syncStudentsToSupabase();
+      return await syncStudentsToSupabase();
     }
 
     function saveResults() {
       localStorage.setItem(STORAGE_KEYS.RESULTS, JSON.stringify(AppState.results));
     }
 
-    function saveSettings() {
+    async function saveSettings() {
       AppState.settings.supabaseUrl = normalizeSupabaseBaseUrl(AppState.settings.supabaseUrl);
       localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(AppState.settings));
       updateSyncBadge();
+      return await syncSettingsToSupabase();
     }
 
-    function updateSyncBadge() {
+    function updateSyncBadge(cloudOk = true) {
       const badge = document.getElementById('syncStatusBadge');
       if (AppState.settings.supabaseUrl && AppState.settings.supabaseKey) {
-        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span> Nube Supabase Conectada`;
+        if (cloudOk) {
+          badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span> Nube Supabase Conectada`;
+        } else {
+          badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400"></span> Revisar Tablas Supabase`;
+        }
       } else {
         badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Modo Local Activo`;
+      }
+    }
+
+    // Sincronizar PIN docente y cupos en Supabase (tabla: orientacion_config)
+    async function syncSettingsToSupabase() {
+      const cleanUrl = normalizeSupabaseBaseUrl(AppState.settings.supabaseUrl);
+      const { supabaseKey } = AppState.settings;
+      if (!cleanUrl || !supabaseKey) return { ok: false, error: 'Sin credenciales Supabase' };
+
+      try {
+        const res = await fetch(`${cleanUrl}/rest/v1/orientacion_config?on_conflict=clave`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Prefer': 'resolution=merge-duplicates,return=minimal'
+          },
+          body: JSON.stringify({
+            clave: 'global',
+            pin_docente: String(AppState.settings.pin || '1234'),
+            cupo_maximo: Number(AppState.settings.maxQuota || 35),
+            actualizado_en: new Date().toISOString()
+          })
+        });
+
+        if (!res.ok) {
+          const errText = await res.text();
+          console.warn('Error sincronizando configuración en Supabase:', res.status, errText);
+          return { ok: false, status: res.status, error: errText };
+        }
+        return { ok: true };
+      } catch (err) {
+        console.warn('Fallo de red sincronizando configuración:', err);
+        return { ok: false, error: err.message };
       }
     }
 
@@ -1173,27 +1223,47 @@
     async function syncResultToSupabase(docId, payload) {
       const cleanUrl = normalizeSupabaseBaseUrl(AppState.settings.supabaseUrl);
       const { supabaseKey } = AppState.settings;
-      if (!cleanUrl || !supabaseKey) return;
+      if (!cleanUrl || !supabaseKey) return { ok: false };
 
       try {
         if (payload === null) {
-          await fetch(`${cleanUrl}/rest/v1/orientacion_ramas?numero_identidad=eq.${encodeURIComponent(docId)}`, {
+          const resDel = await fetch(`${cleanUrl}/rest/v1/orientacion_ramas?numero_identidad=eq.${encodeURIComponent(docId)}`, {
             method: 'DELETE',
             headers: {
               'apikey': supabaseKey,
               'Authorization': `Bearer ${supabaseKey}`
             }
           });
-          return;
+          return { ok: resDel.ok };
         }
 
-        await fetch(`${cleanUrl}/rest/v1/orientacion_ramas`, {
+        // Asegurar primero que el estudiante exista en orientacion_estudiantes para no violar FK
+        const studentObj = AppState.students.find(s => cleanId(s.Numero_Identidad) === docId);
+        if (studentObj) {
+          await fetch(`${cleanUrl}/rest/v1/orientacion_estudiantes?on_conflict=numero_identidad`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': supabaseKey,
+              'Authorization': `Bearer ${supabaseKey}`,
+              'Prefer': 'resolution=merge-duplicates,return=minimal'
+            },
+            body: JSON.stringify([{
+              numero_identidad: docId,
+              nombre_completo: studentObj.Nombre_Completo,
+              grado: studentObj.Grado || '8°',
+              seccion: normalizeSection(studentObj.Sección)
+            }])
+          });
+        }
+
+        const res = await fetch(`${cleanUrl}/rest/v1/orientacion_ramas?on_conflict=numero_identidad`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'apikey': supabaseKey,
             'Authorization': `Bearer ${supabaseKey}`,
-            'Prefer': 'resolution=merge-duplicates'
+            'Prefer': 'resolution=merge-duplicates,return=minimal'
           },
           body: JSON.stringify({
             numero_identidad: docId,
@@ -1201,53 +1271,100 @@
             actualizado_en: new Date().toISOString()
           })
         });
+
+        if (!res.ok) {
+          const errText = await res.text();
+          console.warn('Error sincronizando resultado en Supabase:', res.status, errText);
+          return { ok: false, error: errText };
+        }
+        return { ok: true };
       } catch (err) {
         console.warn('No se pudo sincronizar con Supabase (respaldo local guardado):', err);
+        return { ok: false, error: err.message };
       }
     }
 
     async function syncStudentsToSupabase() {
       const cleanUrl = normalizeSupabaseBaseUrl(AppState.settings.supabaseUrl);
       const { supabaseKey } = AppState.settings;
-      if (!cleanUrl || !supabaseKey) return;
+      if (!cleanUrl || !supabaseKey) return { ok: false, error: 'Sin credenciales Supabase' };
+
+      // Deduplicar estrictamente por numero_identidad antes de enviar lote
+      const uniqueMap = new Map();
+      AppState.students.forEach(s => {
+        const id = cleanId(s.Numero_Identidad);
+        if (id) {
+          uniqueMap.set(id, {
+            numero_identidad: id,
+            nombre_completo: String(s.Nombre_Completo || '').trim(),
+            grado: String(s.Grado || '8°').trim(),
+            seccion: normalizeSection(s.Sección)
+          });
+        }
+      });
+
+      const payloadList = Array.from(uniqueMap.values());
+      if (payloadList.length === 0) return { ok: true, count: 0 };
+
       try {
-        await fetch(`${cleanUrl}/rest/v1/orientacion_estudiantes`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': supabaseKey,
-            'Authorization': `Bearer ${supabaseKey}`,
-            'Prefer': 'resolution=merge-duplicates'
-          },
-          body: JSON.stringify(
-            AppState.students.map(s => ({
-              numero_identidad: cleanId(s.Numero_Identidad),
-              nombre_completo: s.Nombre_Completo,
-              grado: s.Grado,
-              seccion: s.Sección
-            }))
-          )
-        });
+        // Enviar en bloques de 100 registros para evitar límites de tamaño en PostgREST
+        const chunkSize = 100;
+        for (let i = 0; i < payloadList.length; i += chunkSize) {
+          const chunk = payloadList.slice(i, i + chunkSize);
+          const res = await fetch(`${cleanUrl}/rest/v1/orientacion_estudiantes?on_conflict=numero_identidad`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': supabaseKey,
+              'Authorization': `Bearer ${supabaseKey}`,
+              'Prefer': 'resolution=merge-duplicates,return=minimal'
+            },
+            body: JSON.stringify(chunk)
+          });
+
+          if (!res.ok) {
+            const errText = await res.text();
+            console.error('Error Supabase al guardar estudiantes:', res.status, errText);
+            return { ok: false, status: res.status, error: errText };
+          }
+        }
+        return { ok: true, count: payloadList.length };
       } catch (err) {
-        console.warn('Sync estudiantes Supabase omitido:', err);
+        console.error('Error de red al guardar estudiantes en Supabase:', err);
+        return { ok: false, error: err.message };
       }
     }
 
     async function pullFromSupabaseIfConfigured() {
       const cleanUrl = normalizeSupabaseBaseUrl(AppState.settings.supabaseUrl);
       const { supabaseKey } = AppState.settings;
-      if (!cleanUrl || !supabaseKey) return;
+      if (!cleanUrl || !supabaseKey) return false;
+
       try {
         const headers = {
           'apikey': supabaseKey,
-          'Authorization': `Bearer ${supabaseKey}`
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Cache-Control': 'no-cache'
         };
 
-        const [resSt, resData] = await Promise.all([
-          fetch(`${cleanUrl}/rest/v1/orientacion_estudiantes?select=*`, { headers }),
-          fetch(`${cleanUrl}/rest/v1/orientacion_ramas?select=*`, { headers })
+        const [resCfg, resSt, resData] = await Promise.all([
+          fetch(`${cleanUrl}/rest/v1/orientacion_config?clave=eq.global&select=*`, { headers }),
+          fetch(`${cleanUrl}/rest/v1/orientacion_estudiantes?select=*&limit=2000`, { headers }),
+          fetch(`${cleanUrl}/rest/v1/orientacion_ramas?select=*&limit=2000`, { headers })
         ]);
 
+        // 1. Configuración global (PIN y cupo máximo)
+        if (resCfg.ok) {
+          const cfgRows = await resCfg.json();
+          if (Array.isArray(cfgRows) && cfgRows.length > 0) {
+            const cfg = cfgRows[0];
+            if (cfg.pin_docente) AppState.settings.pin = String(cfg.pin_docente).trim();
+            if (cfg.cupo_maximo) AppState.settings.maxQuota = Number(cfg.cupo_maximo);
+            localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(AppState.settings));
+          }
+        }
+
+        // 2. Base de estudiantes matriculados
         if (resSt.ok) {
           const rows = await resSt.json();
           if (Array.isArray(rows) && rows.length > 0) {
@@ -1261,19 +1378,29 @@
           }
         }
 
+        // 3. Resultados del test y selección
         if (resData.ok) {
           const rows = await resData.json();
           if (Array.isArray(rows)) {
+            const cloudResults = {};
             rows.forEach(r => {
               if (r.numero_identidad && r.datos) {
-                AppState.results[cleanId(r.numero_identidad)] = r.datos;
+                cloudResults[cleanId(r.numero_identidad)] = r.datos;
               }
             });
+            // Combinar conservando registros de la nube como fuente principal
+            AppState.results = { ...AppState.results, ...cloudResults };
             localStorage.setItem(STORAGE_KEYS.RESULTS, JSON.stringify(AppState.results));
           }
         }
+
+        const allOk = resSt.ok && resData.ok;
+        updateSyncBadge(allOk);
+        return allOk;
       } catch (err) {
         console.warn('Error al consultar Supabase:', err);
+        updateSyncBadge(false);
+        return false;
       }
     }
 
@@ -1297,6 +1424,7 @@
       e.preventDefault();
       const inputEl = document.getElementById('inputDocumento');
       const errorEl = document.getElementById('loginErrorMsg');
+      const btnSubmit = document.getElementById('btnSubmitLogin');
       const docId = cleanId(inputEl.value);
 
       errorEl.classList.add('hidden');
@@ -1307,7 +1435,11 @@
         return;
       }
 
+      btnSubmit.disabled = true;
+      btnSubmit.classList.add('opacity-70');
       await pullFromSupabaseIfConfigured();
+      btnSubmit.disabled = false;
+      btnSubmit.classList.remove('opacity-70');
 
       const student = AppState.students.find(s => cleanId(s.Numero_Identidad) === docId);
 
@@ -1440,7 +1572,6 @@
     function updateTestTabControls() {
       const tab = AppState.currentTestTab;
 
-      // Actualizar estado visual de las 3 pestañas
       for (let i = 0; i < 3; i++) {
         const btn = document.getElementById(`tabBtn${i}`);
         const slice = AppState.shuffledQuestions.slice(i * 9, i * 9 + 9);
@@ -1455,7 +1586,6 @@
         }
       }
 
-      // Mostrar/ocultar botones de navegación y reflexión final
       document.getElementById('btnPrevBlock').classList.toggle('hidden', tab === 0);
       document.getElementById('btnNextBlock').classList.toggle('hidden', tab === 2);
       document.getElementById('finalReflectionBox').classList.toggle('hidden', tab !== 2);
@@ -1479,7 +1609,6 @@
         return false;
       }
 
-      // Control de velocidad mínima por bloque (20 segundos) para evitar respuestas al azar
       const elapsedSec = (Date.now() - AppState.blockStartTime) / 1000;
       if (elapsedSec < 20 && !AppState.blockWarned[AppState.currentTestTab]) {
         AppState.blockWarned[AppState.currentTestTab] = true;
@@ -1534,7 +1663,6 @@
     document.getElementById('formTest').addEventListener('submit', (e) => {
       e.preventDefault();
 
-      // 1. Verificar que todas las 27 preguntas estén respondidas
       const firstUnansweredIndex = AppState.shuffledQuestions.findIndex(
         q => AppState.studentAnswers[q.id] === undefined
       );
@@ -1555,10 +1683,8 @@
         return;
       }
 
-      // Control de velocidad en el Bloque 3 antes de finalizar
       if (!validateCurrentBlockAnswered()) return;
 
-      // 2. Verificar pregunta final abierta (obligatoria y coherente)
       const reflectionInput = document.getElementById('inputFinalReflection');
       const reflectionErr = document.getElementById('reflectionError');
       const reflectionText = reflectionInput.value.trim();
@@ -1572,7 +1698,6 @@
         return;
       }
 
-      // 3. Evaluar preguntas de Control de Atención (9 = Más o menos [1], 18 = No [0], 27 = Sí [2])
       const controlQuestions = QUESTIONS_BANK.filter(q => q.rama === 'Control');
       let controlErrors = 0;
       controlQuestions.forEach(cq => {
@@ -1581,7 +1706,6 @@
         }
       });
 
-      // Según la hoja de corrección: si falla 2 o más preguntas de control, el test no es válido y se repite
       if (controlErrors >= 2) {
         AppState.failedAttemptsCurrentSession++;
         document.getElementById('attentionRestartBanner').classList.remove('hidden');
@@ -1591,7 +1715,6 @@
         return;
       }
 
-      // 4. Calcular puntajes por Rama (máximo 12 puntos por Rama) y desglose Industrial (Metalmecánica vs Electricidad)
       const scores = {
         Agropecuaria: 0,
         Comercial: 0,
@@ -1599,8 +1722,8 @@
         'Promoción Social': 0
       };
       const industrialSubScores = {
-        Metalmecánica: 0, // 4 ítems -> máx 8 pts
-        Electricidad: 0   // 2 ítems -> máx 4 pts
+        Metalmecánica: 0,
+        Electricidad: 0
       };
 
       const vocationalValues = [];
@@ -1615,20 +1738,17 @@
         }
       });
 
-      // Detección de respuestas planas (Straight-lining: marcar exactamente lo mismo en las 24 afirmaciones)
       const uniqueVocationalChoices = new Set(vocationalValues);
       const isFlatPattern = uniqueVocationalChoices.size === 1;
       const flatOptionLabel = isFlatPattern
         ? (vocationalValues[0] === 2 ? 'Todo Sí' : vocationalValues[0] === 1 ? 'Todo Más o menos' : 'Todo No')
         : null;
 
-      // Porcentajes de afinidad en subramas industriales
       const industrialAffinityPct = {
         Metalmecánica: Math.round((industrialSubScores.Metalmecánica / 8) * 100),
         Electricidad: Math.round((industrialSubScores.Electricidad / 4) * 100)
       };
 
-      // Determinar Rama más alta y si es Interés claro (diferencia >= 3) o Perfil mixto
       const sortedRamas = Object.entries(scores).sort((a, b) => b[1] - a[1]);
       const highestScore = sortedRamas[0][1];
       const secondHighestScore = sortedRamas[1][1];
@@ -1655,7 +1775,6 @@
         answersMap: { ...AppState.studentAnswers }
       };
 
-      // Resetear selectores de vista 3 y habilitar todas sus opciones
       ['selectOpt1', 'selectOpt2', 'selectOpt3'].forEach(selId => {
         const sel = document.getElementById(selId);
         sel.value = '';
@@ -1673,7 +1792,6 @@
     // =========================================================================
     const selectIds = ['selectOpt1', 'selectOpt2', 'selectOpt3'];
 
-    // Evitar visualmente que seleccione la misma Rama en dos casillas
     selectIds.forEach(id => {
       document.getElementById(id).addEventListener('change', () => {
         const chosen = selectIds.map(sId => document.getElementById(sId).value).filter(Boolean);
@@ -1712,7 +1830,6 @@
       const st = AppState.currentStudent;
       const testData = AppState.currentTestPayload;
 
-      // Normalizar Industrial - Metalmecánica / Electricidad hacia "Industrial" para contrastar con el Test
       const normalizedOpt1 = opt1.startsWith('Industrial') ? 'Industrial' : opt1;
       const isCoincident = testData.tiedTop.includes(normalizedOpt1);
 
@@ -1735,9 +1852,11 @@
 
       AppState.results[st.Numero_Identidad] = finalRecord;
       saveResults();
-      await syncResultToSupabase(st.Numero_Identidad, finalRecord);
+      const syncRes = await syncResultToSupabase(st.Numero_Identidad, finalRecord);
+      if (!syncRes.ok) {
+        showToast('Guardado localmente, pero hubo un aviso al sincronizar con Supabase. Verifica las tablas en la nube.', 'warning');
+      }
 
-      // Llenar comprobante ciego (sin revelar resultados del test)
       document.getElementById('receiptName').textContent = st.Nombre_Completo;
       document.getElementById('receiptMeta').textContent = `ID ${st.Numero_Identidad} • ${normalizeSection(st.Sección)}`;
       document.getElementById('receiptOpt1').textContent = opt1;
@@ -1770,6 +1889,17 @@
     document.getElementById('formPin').addEventListener('submit', async (e) => {
       e.preventDefault();
       const enteredPin = document.getElementById('inputPinCheck').value.trim();
+      const btnSubmitPin = document.getElementById('btnSubmitPin');
+
+      btnSubmitPin.disabled = true;
+      btnSubmitPin.textContent = 'Verificando...';
+
+      // Sincronizar primero desde Supabase para traer el PIN actualizado desde cualquier otro dispositivo
+      await pullFromSupabaseIfConfigured();
+
+      btnSubmitPin.disabled = false;
+      btnSubmitPin.textContent = 'Ingresar al Panel';
+
       if (enteredPin !== AppState.settings.pin) {
         document.getElementById('pinErrorMsg').classList.remove('hidden');
         return;
@@ -1781,7 +1911,6 @@
       document.getElementById('inputNewPin').value = AppState.settings.pin || '1234';
       document.getElementById('inputMaxQuota').value = AppState.settings.maxQuota || 35;
 
-      await pullFromSupabaseIfConfigured();
       renderAdminDashboard();
       switchView('viewAdmin');
     });
@@ -1790,7 +1919,20 @@
       switchView('viewLogin');
     });
 
-    // Guardar configuración (Supabase y PIN)
+    // Botón manual de actualización desde Supabase
+    document.getElementById('btnSyncNow').addEventListener('click', async () => {
+      const ok = await pullFromSupabaseIfConfigured();
+      document.getElementById('inputNewPin').value = AppState.settings.pin || '1234';
+      document.getElementById('inputMaxQuota').value = AppState.settings.maxQuota || 35;
+      renderAdminDashboard();
+      if (ok) {
+        showToast('Datos y configuración sincronizados desde la nube Supabase.', 'success');
+      } else {
+        showToast('No se pudieron descargar datos de Supabase. Revisa que hayas ejecutado el script SQL.', 'warning');
+      }
+    });
+
+    // Guardar configuración (Supabase, PIN y Cupos)
     document.getElementById('btnSaveSettings').addEventListener('click', async () => {
       const url = normalizeSupabaseBaseUrl(document.getElementById('inputSupabaseUrl').value);
       const key = document.getElementById('inputSupabaseKey').value.trim();
@@ -1798,20 +1940,29 @@
 
       if (newPin && newPin.length >= 4) {
         AppState.settings.pin = newPin;
+      } else if (newPin) {
+        showToast('El PIN docente debe tener al menos 4 caracteres.', 'warning');
+        return;
       }
+
       AppState.settings.supabaseUrl = url;
       AppState.settings.supabaseKey = key;
-      saveSettings();
+      const cfgSync = await saveSettings();
 
       if (url && key) {
-        await syncStudentsToSupabase();
+        const stSync = await syncStudentsToSupabase();
         await pullFromSupabaseIfConfigured();
         renderAdminDashboard();
+
+        if (!cfgSync.ok || !stSync.ok) {
+          showToast('Guardado en este equipo, pero falta crear la tabla orientacion_config o revisar permisos en Supabase (ver guía SQL).', 'warning');
+          return;
+        }
       }
-      showToast('Configuración guardada y sincronizada correctamente.', 'success');
+      showToast('Configuración y PIN guardados en la nube para todos los dispositivos.', 'success');
     });
 
-    // Descargar plantilla Excel de ejemplo con los encabezados exactos del usuario
+    // Descargar plantilla Excel de ejemplo
     document.getElementById('btnDownloadTemplate').addEventListener('click', () => {
       const sampleData = [
         { Numero_Identidad: '1067000001', Nombre_Completo: 'Ejemplo Estudiante Uno', Grado: '8°', Sección: '8°-1' },
@@ -1853,7 +2004,14 @@
         }
 
         const importedMap = new Map();
-        AppState.students.forEach(s => importedMap.set(cleanId(s.Numero_Identidad), s));
+        // Si solo estaban los 4 ejemplos iniciales (1001..1004) y no tienen resultados, los reemplazamos limpiamente
+        const isOnlyDemoData = AppState.students.length === 4 &&
+          AppState.students.every(s => ['1001', '1002', '1003', '1004'].includes(cleanId(s.Numero_Identidad))) &&
+          Object.keys(AppState.results).length === 0;
+
+        if (!isOnlyDemoData) {
+          AppState.students.forEach(s => importedMap.set(cleanId(s.Numero_Identidad), s));
+        }
 
         let addedOrUpdated = 0;
         let skippedRows = 0;
@@ -1875,10 +2033,15 @@
         });
 
         AppState.students = Array.from(importedMap.values());
-        saveStudents();
+        const syncResult = await saveStudents();
         renderAdminDashboard();
+
         const extraMsg = skippedRows > 0 ? ` (${skippedRows} filas incompletas omitidas)` : '';
-        showToast(`Se cargaron ${addedOrUpdated} estudiantes correctamente${extraMsg}. Total en base: ${AppState.students.length}.`, 'success');
+        if (syncResult && syncResult.ok) {
+          showToast(`¡Listo! Se cargaron y sincronizaron en la nube ${addedOrUpdated} estudiantes${extraMsg}. Ya son visibles en todos los dispositivos.`, 'success');
+        } else {
+          showToast(`Se cargaron ${addedOrUpdated} estudiantes localmente, pero Supabase rechazó la subida (${syncResult?.error || 'verifica la tabla orientacion_estudiantes y sus políticas RLS'}).`, 'error');
+        }
       } catch (err) {
         console.error(err);
         showToast('Error al leer el archivo Excel. Verifica que no esté dañado o protegido con contraseña.', 'error');
@@ -1887,15 +2050,15 @@
     });
 
     // Actualizar cupo máximo por Rama
-    document.getElementById('inputMaxQuota').addEventListener('change', (e) => {
+    document.getElementById('inputMaxQuota').addEventListener('change', async (e) => {
       const val = parseInt(e.target.value, 10);
       AppState.settings.maxQuota = (!isNaN(val) && val > 0) ? val : 35;
       e.target.value = AppState.settings.maxQuota;
-      saveSettings();
+      await saveSettings();
       renderAdminDashboard();
     });
 
-    // Asistente de Distribución Inteligente respetando cupo máximo (35 por Rama)
+    // Asistente de Distribución Inteligente respetando cupo máximo
     document.getElementById('btnSmartDistribute').addEventListener('click', async () => {
       const maxQuota = AppState.settings.maxQuota || 35;
       const ramas = [
@@ -1922,12 +2085,10 @@
         return;
       }
 
-      // Reiniciar asignaciones antes de correr el algoritmo
       completedList.forEach(r => {
         r.assignedRama = 'Por definir (Revisar)';
       });
 
-      // Prioridad 1: Coincidencia exacta (Test == 1.ª opción), ordenados por mayor puntaje vocacional
       const prio1 = completedList
         .filter(r => r.coincidence === 'Coincide')
         .sort((a, b) => (b.test.scores[b.test.topRamaRaw] || 0) - (a.test.scores[a.test.topRamaRaw] || 0));
@@ -1940,7 +2101,6 @@
         }
       });
 
-      // Prioridad 2: Discrepancia en 1.ª opción, pero su 2.ª opción sí coincide con su perfil vocacional (ordenados por puntaje)
       const prio2 = completedList
         .filter(r => {
           if (r.assignedRama !== 'Por definir (Revisar)') return false;
@@ -2079,7 +2239,6 @@
       document.getElementById('kpiCoincidence').textContent = `${coincidencePct}%`;
       document.getElementById('kpiDiscrepancy').textContent = discrepancyCount;
 
-      // Actualizar contadores y barras de cupo por Rama
       const maxQuota = AppState.settings.maxQuota || 35;
       const distMap = {
         'Agropecuaria': { countId: 'distAgro', badgeId: 'quotaBadgeAgro', barId: 'barQuotaAgro', color: 'bg-emerald-500' },
@@ -2104,7 +2263,6 @@
 
       renderComparisonChart(completedRecords);
 
-      // Filtros de la tabla
       const sectionFilter = document.getElementById('filterSection').value;
       const statusFilter = document.getElementById('filterStatus').value;
       const searchFilter = document.getElementById('filterSearch').value.trim().toLowerCase();
@@ -2237,13 +2395,11 @@
       lucide.createIcons();
     }
 
-    // Eventos de filtrado en tiempo real
     ['filterSection', 'filterStatus'].forEach(id => {
       document.getElementById(id).addEventListener('change', renderAdminDashboard);
     });
     document.getElementById('filterSearch').addEventListener('input', renderAdminDashboard);
 
-    // Reiniciar intento de un estudiante individual
     window.resetStudentAttempt = function(docId) {
       const st = AppState.students.find(s => cleanId(s.Numero_Identidad) === docId);
       openConfirmModal(
@@ -2259,7 +2415,6 @@
       );
     };
 
-    // Fusión de múltiples archivos Excel exportados desde varios equipos
     document.getElementById('inputMergeExcel').addEventListener('change', async (e) => {
       const files = Array.from(e.target.files || []);
       if (!files.length) return;
@@ -2285,7 +2440,6 @@
             const studentGrade = String(row.Grado || '8°').trim();
             const studentSec = normalizeSection(row.Sección || '8°-1');
 
-            // Asegurar que el estudiante exista en la lista maestra aunque no haya sido importado antes en este PC
             if (!studentMap.has(docId) && studentName) {
               studentMap.set(docId, {
                 Numero_Identidad: docId,
@@ -2352,14 +2506,18 @@
       }
 
       AppState.students = Array.from(studentMap.values());
-      saveStudents();
+      await saveStudents();
       saveResults();
+      for (const [docId, rec] of Object.entries(AppState.results)) {
+        if (rec && rec.completed) {
+          await syncResultToSupabase(docId, rec);
+        }
+      }
       renderAdminDashboard();
       showToast(`Fusión finalizada: ${mergedCount} registros nuevos integrados (${skippedCount} omitidos por ya existir).`, 'success');
       e.target.value = '';
     });
 
-    // Exportar reporte consolidado en Excel (.xlsx) con pestañas por sección y por Rama Técnica
     document.getElementById('btnExportExcel').addEventListener('click', () => {
       if (AppState.students.length === 0) {
         showToast('No hay estudiantes registrados para exportar.', 'warning');
@@ -2430,7 +2588,6 @@
       const allRows = AppState.students.map(buildRow);
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(allRows), 'Consolidado_Grado_8');
 
-      // Pestañas por cada Rama Técnica oficial (estudiantes ya distribuidos)
       const ramasTabs = [
         { rama: 'Agropecuaria', tabName: 'Rama_Agropecuaria' },
         { rama: 'Comercial', tabName: 'Rama_Comercial' },
@@ -2446,13 +2603,11 @@
         }
       });
 
-      // Pestaña de casos pendientes por definir / revisar
       const reviewRows = allRows.filter(r => r.Rama_Final_Asignada === 'Por definir (Revisar)');
       if (reviewRows.length > 0) {
         XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(reviewRows), 'Por_Definir_Revisar');
       }
 
-      // Pestañas adicionales por cada sección
       ['8°-1', '8°-2', '8°-3', '8°-4'].forEach(sec => {
         const secRows = allRows.filter(r => r.Sección === sec);
         if (secRows.length > 0) {
@@ -2465,7 +2620,6 @@
       showToast('Archivo Excel exportado con hojas por Rama Técnica y por sección.', 'success');
     });
 
-    // Limpiar todos los datos locales
     document.getElementById('btnClearAllData').addEventListener('click', () => {
       openConfirmModal(
         'Borrar resultados y reiniciar base local',
@@ -2479,7 +2633,6 @@
       );
     });
 
-    // Proteger al estudiante contra cierre o recarga accidental mientras responde el test o la selección
     window.addEventListener('beforeunload', (e) => {
       if (AppState.currentStudent) {
         e.preventDefault();
@@ -2487,7 +2640,6 @@
       }
     });
 
-    // Inicialización al cargar la página
     window.addEventListener('DOMContentLoaded', async () => {
       await loadState();
       lucide.createIcons();
