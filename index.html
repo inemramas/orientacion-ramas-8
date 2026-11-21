@@ -1,0 +1,2458 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orientación Vocacional y Selección de Rama Técnica | Grado 8°</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- SheetJS para importar y exportar Excel (.xlsx / .csv) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0b1120;
+      color: #f1f5f9;
+    }
+    /* Barra de desplazamiento personalizada */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+    /* Estilos de impresión exclusivos para el Acta Individual */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #printableActaModal,
+      #printableActaModal * {
+        visibility: visible;
+      }
+      #printableActaModal {
+        position: fixed;
+        inset: 0;
+        background: #ffffff !important;
+        color: #0f172a !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: block !important;
+      }
+      #printableActaCard {
+        box-shadow: none !important;
+        border: none !important;
+        background: #ffffff !important;
+        color: #0f172a !important;
+        max-width: 100% !important;
+        width: 100% !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-emerald-500/30 selection:text-emerald-200">
+
+  <!-- Barra superior institucional -->
+  <header class="sticky top-0 z-30 border-b border-slate-800/80 bg-slate-900/90 backdrop-blur-md">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-lg shadow-emerald-950/50">
+          <i data-lucide="compass" class="w-6 h-6 text-white"></i>
+        </div>
+        <div>
+          <h1 class="text-sm sm:text-base font-bold tracking-tight text-white leading-tight">
+            Exploración Vocacional y Ramas Técnicas
+          </h1>
+          <p class="text-xs text-slate-400">Grado 8° • Proceso de Selección para Media Técnica (9° - 11°)</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Indicador de estado de sincronización -->
+        <span id="syncStatusBadge" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          Modo Local Activo
+        </span>
+
+        <!-- Botón de acceso docente -->
+        <button
+          id="btnOpenAdmin"
+          type="button"
+          class="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition cursor-pointer"
+        >
+          <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+          <span>Panel Docente</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenedor principal -->
+  <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-10">
+
+    <!-- Alerta / Notificación flotante (reemplazo elegante de alert/confirm) -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-md w-full pointer-events-none px-4 sm:px-0"></div>
+
+    <!-- ===================================================================== -->
+    <!-- VISTA 1: INGRESO DEL ESTUDIANTE POR NÚMERO DE IDENTIDAD               -->
+    <!-- ===================================================================== -->
+    <section id="viewLogin" class="max-w-lg mx-auto mt-4 sm:mt-10">
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl">
+        <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mb-5">
+          <i data-lucide="user-check" class="w-6 h-6 text-emerald-400"></i>
+        </div>
+
+        <h2 class="text-xl sm:text-2xl font-bold text-white mb-2">Ingreso de Estudiante</h2>
+        <p class="text-sm text-slate-400 mb-6 leading-relaxed">
+          Digita tu <strong class="text-slate-200">Número de Identidad</strong> (Tarjeta de Identidad o Cédula) sin puntos ni espacios para verificar tu matrícula en Grado 8° e iniciar el proceso.
+        </p>
+
+        <form id="formLogin" class="space-y-4">
+          <div>
+            <label for="inputDocumento" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+              Número de Identidad
+            </label>
+            <div class="relative">
+              <input
+                type="text"
+                id="inputDocumento"
+                inputmode="numeric"
+                autocomplete="off"
+                placeholder="Ej: 1067894512"
+                class="w-full px-4 py-3.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder-slate-500 text-base font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
+                required
+              />
+            </div>
+            <p id="loginErrorMsg" class="hidden mt-2 text-xs text-rose-400 flex items-center gap-1.5">
+              <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
+              <span></span>
+            </p>
+          </div>
+
+          <button
+            type="submit"
+            class="w-full py-3.5 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-semibold text-sm sm:text-base shadow-lg shadow-emerald-950/60 transition flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span>Verificar Identidad y Continuar</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </form>
+
+        <div class="mt-6 pt-5 border-t border-slate-800/80 flex items-start gap-3 text-xs text-slate-400">
+          <i data-lucide="info" class="w-4 h-4 text-sky-400 shrink-0 mt-0.5"></i>
+          <p>
+            El proceso consta de dos etapas obligatorias: <strong class="text-slate-300">1) Test de intereses (27 afirmaciones + reflexión)</strong> y <strong class="text-slate-300">2) Selección directa de tus 3 opciones de Rama Técnica</strong>.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- VISTA 2: TEST DE INTERESES (27 AFIRMACIONES + PREGUNTA FINAL)         -->
+    <!-- ===================================================================== -->
+    <section id="viewTest" class="hidden space-y-6">
+      <!-- Tarjeta de identificación del estudiante -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-3.5">
+          <div class="w-11 h-11 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold text-base shrink-0" id="studentAvatar">
+            8°
+          </div>
+          <div>
+            <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Estudiante Verificado</p>
+            <h2 id="studentNameDisplay" class="text-base sm:text-lg font-bold text-white leading-snug">---</h2>
+            <div class="flex flex-wrap items-center gap-2 mt-1 text-xs text-slate-300">
+              <span class="px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700">ID: <strong id="studentIdDisplay">---</strong></span>
+              <span class="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">Grado: <strong id="studentGradeDisplay">---</strong></span>
+              <span class="px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-300 border border-sky-500/30">Sección: <strong id="studentSectionDisplay">---</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          id="btnLogoutStudent"
+          class="self-start sm:self-center px-3 py-2 rounded-xl text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition inline-flex items-center gap-1.5 cursor-pointer"
+        >
+          <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+          <span>Salir</span>
+        </button>
+      </div>
+
+      <!-- Aviso si hubo reinicio por control de lectura -->
+      <div id="attentionRestartBanner" class="hidden bg-amber-950/60 border border-amber-500/50 rounded-2xl p-4 sm:p-5 flex items-start gap-3.5">
+        <i data-lucide="alert-triangle" class="w-6 h-6 text-amber-400 shrink-0 mt-0.5"></i>
+        <div class="text-sm text-amber-100">
+          <p class="font-bold text-amber-300 mb-1">Test reiniciado por control de lectura</p>
+          <p class="text-amber-200/90 leading-relaxed">
+            Se detectó que respondiste sin leer con atención las preguntas de control. El orden de las afirmaciones se ha reorganizado. Por favor, lee cada enunciado completo antes de marcar tu respuesta.
+          </p>
+        </div>
+      </div>
+
+      <!-- Instrucciones y progreso -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+          <div>
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 mb-1.5">
+              Etapa 1 de 2 • Obligatoria
+            </span>
+            <h3 class="text-lg sm:text-xl font-bold text-white">Instrumento 1: Test de Intereses</h3>
+          </div>
+          <div class="text-left sm:text-right">
+            <span id="testProgressText" class="text-sm font-bold text-emerald-400">0 / 27 respondidas</span>
+            <div class="w-full sm:w-48 h-2 bg-slate-800 rounded-full overflow-hidden mt-1.5">
+              <div id="testProgressBar" class="h-full bg-emerald-500 transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+        <p class="text-sm text-slate-400 mb-4">
+          Lee cada afirmación completa y marca una sola opción (<strong class="text-slate-200">Sí</strong>, <strong class="text-slate-200">Más o menos</strong> o <strong class="text-slate-200">No</strong>). El test está dividido en <strong class="text-slate-200">3 bloques de 9 preguntas</strong>. Algunas preguntas piden una respuesta específica; léelas con atención.
+        </p>
+
+        <!-- Pestañas de navegación de los 3 bloques de 9 preguntas -->
+        <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800/80" role="tablist">
+          <button type="button" id="tabBtn0" onclick="goToTestTab(0)" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold border transition flex items-center justify-center gap-2 cursor-pointer bg-emerald-600/20 border-emerald-500 text-emerald-300">
+            <span>Bloque 1</span>
+            <span class="hidden sm:inline text-[11px] font-normal opacity-80">(1 - 9)</span>
+          </button>
+          <button type="button" id="tabBtn1" onclick="goToTestTab(1)" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold border transition flex items-center justify-center gap-2 cursor-pointer bg-slate-950 border-slate-800 text-slate-400">
+            <span>Bloque 2</span>
+            <span class="hidden sm:inline text-[11px] font-normal opacity-80">(10 - 18)</span>
+          </button>
+          <button type="button" id="tabBtn2" onclick="goToTestTab(2)" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold border transition flex items-center justify-center gap-2 cursor-pointer bg-slate-950 border-slate-800 text-slate-400">
+            <span>Bloque 3</span>
+            <span class="hidden sm:inline text-[11px] font-normal opacity-80">(19 - 27)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Formulario del Test por Bloques -->
+      <form id="formTest" class="space-y-4" novalidate>
+        <div id="questionsContainer" class="space-y-3.5"></div>
+
+        <!-- Pregunta Final Obligatoria (Visible únicamente en el Bloque 3) -->
+        <div id="finalReflectionBox" class="hidden bg-slate-900 border border-slate-700/80 rounded-2xl p-5 sm:p-6 mt-6 shadow-lg">
+          <label for="inputFinalReflection" class="block text-sm sm:text-base font-bold text-white mb-1.5">
+            Pregunta final (obligatoria) <span class="text-rose-400">*</span>
+          </label>
+          <p class="text-xs sm:text-sm text-slate-400 mb-3">
+            Escribe en una línea la afirmación con la que más te identificaste y explica brevemente por qué.
+          </p>
+          <textarea
+            id="inputFinalReflection"
+            rows="2"
+            placeholder="Ej: Me identifiqué con la afirmación sobre energía solar porque me gustaría aprender a instalar paneles en mi comunidad..."
+            class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
+          ></textarea>
+          <p id="reflectionError" class="hidden mt-2 text-xs text-rose-400"></p>
+        </div>
+
+        <!-- Controles de navegación entre bloques -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3">
+          <button
+            type="button"
+            id="btnPrevBlock"
+            class="hidden w-full sm:w-auto px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs sm:text-sm border border-slate-700 transition inline-flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            <span>Bloque Anterior</span>
+          </button>
+
+          <div class="flex-1"></div>
+
+          <button
+            type="button"
+            id="btnNextBlock"
+            class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-semibold text-sm shadow-lg shadow-sky-950/60 transition inline-flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span>Siguiente Bloque (9 preguntas)</span>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+
+          <button
+            type="submit"
+            id="btnSubmitTest"
+            class="hidden w-full sm:w-auto px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm sm:text-base shadow-lg shadow-emerald-950/60 transition inline-flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span>Guardar Test y Pasar a Selección de Rama</span>
+            <i data-lucide="check-circle" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- VISTA 3: SELECCIÓN DIRECTA DE RAMA TÉCNICA (3 OPCIONES PRIORIZADAS)   -->
+    <!-- ===================================================================== -->
+    <section id="viewSelection" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6">
+        <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-500/15 text-sky-300 border border-sky-500/30 mb-2">
+          Etapa 2 de 2 • Selección Directa
+        </span>
+        <h2 class="text-xl sm:text-2xl font-bold text-white mb-2">Selecciona tus 3 Opciones de Rama Técnica</h2>
+        <p class="text-sm text-slate-400 leading-relaxed">
+          Revisa la descripción de cada Rama Técnica que cursarás en <strong class="text-slate-200">9°, 10° y 11°</strong>. Elige tu <strong class="text-emerald-400">1.ª Opción (Principal)</strong>, <strong class="text-sky-400">2.ª Opción</strong> y <strong class="text-amber-400">3.ª Opción</strong> en orden de preferencia personal. No puedes repetir la misma especialidad.
+        </p>
+      </div>
+
+      <!-- Catálogo informativo de las 4 Ramas (con las 2 subramas de Industrial) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Agropecuaria -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 hover:border-emerald-500/40 transition">
+          <div class="flex items-center gap-3 mb-2.5">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center">
+              <i data-lucide="sprout" class="w-5 h-5"></i>
+            </div>
+            <h3 class="text-base font-bold text-white">Agropecuaria</h3>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+            Producción agrícola y pecuaria, manejo de cultivos, cuidado de especies animales, piscicultura, conservación de suelos, aguas y técnicas modernas de finca.
+          </p>
+        </div>
+
+        <!-- Comercial -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 hover:border-sky-500/40 transition">
+          <div class="flex items-center gap-3 mb-2.5">
+            <div class="w-10 h-10 rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center">
+              <i data-lucide="briefcase" class="w-5 h-5"></i>
+            </div>
+            <h3 class="text-base font-bold text-white">Comercial</h3>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+            Gestión empresarial, contabilidad, finanzas, ahorro e inversión, emprendimiento, atención al cliente, costos, ventas y administración de negocios.
+          </p>
+        </div>
+
+        <!-- Industrial (Metalmecánica y Electricidad) -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 hover:border-amber-500/40 transition">
+          <div class="flex items-center gap-3 mb-2.5">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center">
+              <i data-lucide="wrench" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-white">Industrial</h3>
+              <span class="text-[11px] font-medium text-amber-300">Subramas: Metalmecánica • Electricidad</span>
+            </div>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+            <strong class="text-slate-200">Metalmecánica:</strong> mecanizado, torno, soldadura, herramientas y precisión. <strong class="text-slate-200">Electricidad:</strong> circuitos, instalaciones residenciales y taller fotovoltaico (paneles solares).
+          </p>
+        </div>
+
+        <!-- Promoción Social -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 hover:border-rose-500/40 transition">
+          <div class="flex items-center gap-3 mb-2.5">
+            <div class="w-10 h-10 rounded-xl bg-rose-500/15 text-rose-400 flex items-center justify-center">
+              <i data-lucide="heart-pulse" class="w-5 h-5"></i>
+            </div>
+            <h3 class="text-base font-bold text-white">Promoción Social</h3>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+            Salud comunitaria, epidemiología, primeros auxilios, salud y medio ambiente, microbiología básica y educación en salud sexual y reproductiva.
+          </p>
+        </div>
+      </div>
+
+      <!-- Formulario de jerarquía de 3 opciones -->
+      <form id="formSelection" class="bg-slate-900 border border-slate-700 rounded-2xl p-5 sm:p-7 space-y-5 shadow-xl">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Primera Opción -->
+          <div class="p-4 rounded-xl bg-slate-950 border border-emerald-500/40">
+            <label for="selectOpt1" class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-400 mb-2">
+              <span class="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center text-xs font-extrabold">1</span>
+              Primera Opción (Preferida)
+            </label>
+            <select
+              id="selectOpt1"
+              class="w-full px-3.5 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              required
+            >
+              <option value="">-- Selecciona 1.ª opción --</option>
+              <option value="Agropecuaria">Agropecuaria</option>
+              <option value="Comercial">Comercial</option>
+              <option value="Industrial - Metalmecánica">Industrial (Metalmecánica)</option>
+              <option value="Industrial - Electricidad">Industrial (Electricidad)</option>
+              <option value="Promoción Social">Promoción Social</option>
+            </select>
+          </div>
+
+          <!-- Segunda Opción -->
+          <div class="p-4 rounded-xl bg-slate-950 border border-sky-500/40">
+            <label for="selectOpt2" class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-sky-400 mb-2">
+              <span class="w-5 h-5 rounded-full bg-sky-500 text-slate-950 flex items-center justify-center text-xs font-extrabold">2</span>
+              Segunda Opción
+            </label>
+            <select
+              id="selectOpt2"
+              class="w-full px-3.5 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500"
+              required
+            >
+              <option value="">-- Selecciona 2.ª opción --</option>
+              <option value="Agropecuaria">Agropecuaria</option>
+              <option value="Comercial">Comercial</option>
+              <option value="Industrial - Metalmecánica">Industrial (Metalmecánica)</option>
+              <option value="Industrial - Electricidad">Industrial (Electricidad)</option>
+              <option value="Promoción Social">Promoción Social</option>
+            </select>
+          </div>
+
+          <!-- Tercera Opción -->
+          <div class="p-4 rounded-xl bg-slate-950 border border-amber-500/40">
+            <label for="selectOpt3" class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">
+              <span class="w-5 h-5 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center text-xs font-extrabold">3</span>
+              Tercera Opción
+            </label>
+            <select
+              id="selectOpt3"
+              class="w-full px-3.5 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-500"
+              required
+            >
+              <option value="">-- Selecciona 3.ª opción --</option>
+              <option value="Agropecuaria">Agropecuaria</option>
+              <option value="Comercial">Comercial</option>
+              <option value="Industrial - Metalmecánica">Industrial (Metalmecánica)</option>
+              <option value="Industrial - Electricidad">Industrial (Electricidad)</option>
+              <option value="Promoción Social">Promoción Social</option>
+            </select>
+          </div>
+        </div>
+
+        <p id="selectionErrorMsg" class="hidden text-xs text-rose-400 flex items-center gap-1.5">
+          <i data-lucide="alert-circle" class="w-4 h-4"></i>
+          <span></span>
+        </p>
+
+        <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-800">
+          <p class="text-xs text-slate-400">
+            Verifica tus tres elecciones antes de enviar. Una vez enviadas quedarán registradas en el sistema institucional.
+          </p>
+          <button
+            type="submit"
+            class="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm sm:text-base shadow-lg shadow-emerald-950/60 transition inline-flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <i data-lucide="send" class="w-4 h-4"></i>
+            <span>Enviar Selección Definitiva</span>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- VISTA 4: COMPROBANTE DE FINALIZACIÓN (SIN MOSTRAR RESULTADOS DEL TEST) -->
+    <!-- ===================================================================== -->
+    <section id="viewSuccess" class="hidden max-w-xl mx-auto mt-6">
+      <div class="bg-slate-900 border border-emerald-500/40 rounded-2xl p-6 sm:p-8 text-center shadow-2xl">
+        <div class="w-16 h-16 rounded-full bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center mx-auto mb-5">
+          <i data-lucide="check-circle-2" class="w-9 h-9 text-emerald-400"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-white mb-2">¡Registro Completado con Éxito!</h2>
+        <p class="text-sm text-slate-400 mb-6">
+          Tus respuestas del test y tu selección directa de Rama Técnica han sido almacenadas correctamente para el proceso de orientación vocacional.
+        </p>
+
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 sm:p-5 text-left space-y-2.5 text-sm mb-6">
+          <div class="flex justify-between border-b border-slate-800/80 pb-2">
+            <span class="text-slate-400">Estudiante:</span>
+            <span id="receiptName" class="font-semibold text-white text-right">---</span>
+          </div>
+          <div class="flex justify-between border-b border-slate-800/80 pb-2">
+            <span class="text-slate-400">Identificación / Curso:</span>
+            <span id="receiptMeta" class="font-medium text-slate-200 text-right">---</span>
+          </div>
+          <div class="flex justify-between border-b border-slate-800/80 pb-2">
+            <span class="text-slate-400">1.ª Opción Seleccionada:</span>
+            <span id="receiptOpt1" class="font-bold text-emerald-400 text-right">---</span>
+          </div>
+          <div class="flex justify-between border-b border-slate-800/80 pb-2">
+            <span class="text-slate-400">2.ª Opción Seleccionada:</span>
+            <span id="receiptOpt2" class="font-medium text-sky-300 text-right">---</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-400">3.ª Opción Seleccionada:</span>
+            <span id="receiptOpt3" class="font-medium text-amber-300 text-right">---</span>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          id="btnFinishAndReset"
+          class="w-full py-3.5 px-5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-sm border border-slate-700 transition inline-flex items-center justify-center gap-2 cursor-pointer"
+        >
+          <i data-lucide="home" class="w-4 h-4"></i>
+          <span>Finalizar y Volver al Inicio</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- VISTA 5: PANEL ADMINISTRATIVO DOCENTE (IMPORTACIÓN, CONTRASTE, EXCEL) -->
+    <!-- ===================================================================== -->
+    <section id="viewAdmin" class="hidden space-y-6">
+      <!-- Cabecera Admin -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 mb-1.5">
+            Administración y Orientación Vocacional
+          </span>
+          <h2 class="text-xl sm:text-2xl font-bold text-white">Panel de Control Docente — Grado 8°</h2>
+          <p class="text-xs sm:text-sm text-slate-400 mt-0.5">
+            Gestiona la base de datos de estudiantes, contrasta los puntajes ocultos del test con la selección directa y exporta reportes.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2.5">
+          <label
+            for="inputMergeExcel"
+            class="px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-sky-950/50 transition inline-flex items-center gap-2 cursor-pointer"
+            title="Combina archivos Excel exportados desde distintos equipos sin duplicar estudiantes"
+          >
+            <i data-lucide="git-merge" class="w-4 h-4"></i>
+            <span>Fusionar Resultados (.xlsx)</span>
+            <input type="file" id="inputMergeExcel" accept=".xlsx,.xls" multiple class="hidden" />
+          </label>
+
+          <button
+            type="button"
+            id="btnExportExcel"
+            class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-emerald-950/50 transition inline-flex items-center gap-2 cursor-pointer"
+          >
+            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+            <span>Exportar Resultados (.xlsx)</span>
+          </button>
+
+          <button
+            type="button"
+            id="btnCloseAdmin"
+            class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-medium border border-slate-700 transition inline-flex items-center gap-2 cursor-pointer"
+          >
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            <span>Vista Estudiante</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- KPIs / Resumen por secciones -->
+      <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+          <p class="text-xs text-slate-400 font-medium">Total Matriculados</p>
+          <p id="kpiTotalStudents" class="text-2xl font-extrabold text-white mt-1">0</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+          <p class="text-xs text-slate-400 font-medium">Completados</p>
+          <p id="kpiCompleted" class="text-2xl font-extrabold text-emerald-400 mt-1">0</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+          <p class="text-xs text-slate-400 font-medium">Pendientes</p>
+          <p id="kpiPending" class="text-2xl font-extrabold text-amber-400 mt-1">0</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+          <p class="text-xs text-slate-400 font-medium">Coincidencia Test vs 1.ª Op.</p>
+          <p id="kpiCoincidence" class="text-2xl font-extrabold text-sky-400 mt-1">0%</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 col-span-2 lg:col-span-1">
+          <p class="text-xs text-slate-400 font-medium">Discrepancias (Alerta)</p>
+          <p id="kpiDiscrepancy" class="text-2xl font-extrabold text-rose-400 mt-1">0</p>
+        </div>
+      </div>
+
+      <!-- Resumen de Distribución Final por Rama Técnica -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-4">
+          <div>
+            <h3 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="layers" class="w-4 h-4 text-emerald-400"></i>
+              Distribución Oficial y Control de Cupos por Rama Técnica
+            </h3>
+            <p class="text-xs text-slate-400">
+              Cupo máximo configurable por taller (por defecto <strong class="text-slate-200">35 estudiantes</strong>). Al exportar a Excel se crea una pestaña por cada Rama.
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="flex items-center gap-1.5 bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5">
+              <label for="inputMaxQuota" class="text-[11px] text-slate-400 font-medium">Cupo máx/Rama:</label>
+              <input
+                type="number"
+                id="inputMaxQuota"
+                min="1"
+                max="200"
+                value="35"
+                class="w-14 bg-slate-900 border border-slate-700 rounded text-xs font-bold text-white text-center py-0.5 focus:outline-none focus:border-emerald-500"
+              />
+            </div>
+
+            <button
+              type="button"
+              id="btnSmartDistribute"
+              class="px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white shadow-md shadow-emerald-950/50 transition inline-flex items-center gap-1.5 cursor-pointer"
+              title="Asigna primero a coincidentes (1.ª opción) y luego a quienes coinciden con su 2.ª opción respetando el cupo máximo de 35"
+            >
+              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+              <span>Asistente de Distribución Inteligente</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div class="p-3.5 rounded-xl bg-slate-950 border border-emerald-500/30">
+            <div class="flex items-center justify-between">
+              <p class="text-[11px] font-semibold text-emerald-400 uppercase">Agropecuaria</p>
+              <span id="quotaBadgeAgro" class="text-[11px] font-bold text-slate-400">0 / 35</span>
+            </div>
+            <p id="distAgro" class="text-xl font-extrabold text-white mt-1">0</p>
+            <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden mt-2">
+              <div id="barQuotaAgro" class="h-full bg-emerald-500 transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-950 border border-sky-500/30">
+            <div class="flex items-center justify-between">
+              <p class="text-[11px] font-semibold text-sky-400 uppercase">Comercial</p>
+              <span id="quotaBadgeComercial" class="text-[11px] font-bold text-slate-400">0 / 35</span>
+            </div>
+            <p id="distComercial" class="text-xl font-extrabold text-white mt-1">0</p>
+            <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden mt-2">
+              <div id="barQuotaComercial" class="h-full bg-sky-500 transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-950 border border-amber-500/30">
+            <div class="flex items-center justify-between">
+              <p class="text-[11px] font-semibold text-amber-400 uppercase">Ind. Metalmecánica</p>
+              <span id="quotaBadgeMetal" class="text-[11px] font-bold text-slate-400">0 / 35</span>
+            </div>
+            <p id="distMetal" class="text-xl font-extrabold text-white mt-1">0</p>
+            <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden mt-2">
+              <div id="barQuotaMetal" class="h-full bg-amber-500 transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-950 border border-orange-500/30">
+            <div class="flex items-center justify-between">
+              <p class="text-[11px] font-semibold text-orange-400 uppercase">Ind. Electricidad</p>
+              <span id="quotaBadgeElec" class="text-[11px] font-bold text-slate-400">0 / 35</span>
+            </div>
+            <p id="distElec" class="text-xl font-extrabold text-white mt-1">0</p>
+            <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden mt-2">
+              <div id="barQuotaElec" class="h-full bg-orange-500 transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-950 border border-rose-500/30 col-span-2 sm:col-span-1">
+            <div class="flex items-center justify-between">
+              <p class="text-[11px] font-semibold text-rose-400 uppercase">Promoción Social</p>
+              <span id="quotaBadgeSocial" class="text-[11px] font-bold text-slate-400">0 / 35</span>
+            </div>
+            <p id="distSocial" class="text-xl font-extrabold text-white mt-1">0</p>
+            <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden mt-2">
+              <div id="barQuotaSocial" class="h-full bg-rose-500 transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gráfico Comparativo: Demanda Directa (1.ª Opción) vs. Vocación Real (Test) -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div>
+            <h3 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="bar-chart-3" class="w-4 h-4 text-sky-400"></i>
+              Análisis Comparativo: Demanda Directa vs. Vocación Real (Test)
+            </h3>
+            <p class="text-xs text-slate-400">
+              Permite sustentar ante Consejo Académico y padres de familia la diferencia entre lo que los estudiantes piden y su afinidad real.
+            </p>
+          </div>
+          <div class="flex items-center gap-4 text-xs">
+            <span class="inline-flex items-center gap-1.5 text-slate-300">
+              <span class="w-2.5 h-2.5 rounded-sm bg-sky-500"></span> 1.ª Opción Elegida (Directa)
+            </span>
+            <span class="inline-flex items-center gap-1.5 text-slate-300">
+              <span class="w-2.5 h-2.5 rounded-sm bg-emerald-500"></span> Mayor Puntaje en Test
+            </span>
+          </div>
+        </div>
+        <div id="comparisonChartContainer" class="space-y-3.5"></div>
+      </div>
+
+      <!-- Carga de Excel y Configuración Cloud (Supabase opcional) -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <!-- Importar Base de Datos Excel -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <i data-lucide="upload-cloud" class="w-5 h-5 text-emerald-400"></i>
+                Importar Base de Datos (Excel / CSV)
+              </h3>
+              <p class="text-xs text-slate-400 mt-1">
+                Columnas requeridas: <code class="text-emerald-300 bg-slate-950 px-1.5 py-0.5 rounded">Numero_Identidad</code>, <code class="text-emerald-300 bg-slate-950 px-1.5 py-0.5 rounded">Nombre_Completo</code>, <code class="text-emerald-300 bg-slate-950 px-1.5 py-0.5 rounded">Grado</code>, <code class="text-emerald-300 bg-slate-950 px-1.5 py-0.5 rounded">Sección</code>.
+              </p>
+            </div>
+            <button
+              type="button"
+              id="btnDownloadTemplate"
+              class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-sky-300 border border-slate-700 transition cursor-pointer"
+            >
+              Plantilla .xlsx
+            </button>
+          </div>
+
+          <label class="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-slate-700 hover:border-emerald-500/60 rounded-xl bg-slate-950/60 cursor-pointer transition p-4 text-center">
+            <i data-lucide="file-plus-2" class="w-7 h-7 text-slate-400 mb-1.5"></i>
+            <span class="text-xs sm:text-sm font-medium text-slate-200">Haz clic para seleccionar tu archivo Excel (.xlsx, .xls, .csv)</span>
+            <span class="text-[11px] text-slate-500 mt-0.5">Se actualizarán los estudiantes sin borrar respuestas ya registradas</span>
+            <input type="file" id="inputExcelFile" accept=".xlsx,.xls,.csv" class="hidden" />
+          </label>
+        </div>
+
+        <!-- Configuración de Sincronización en Nube (Supabase) y Seguridad -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3">
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <i data-lucide="database" class="w-5 h-5 text-sky-400"></i>
+            Sincronización Multi-Equipo (Supabase Opcional)
+          </h3>
+          <p class="text-xs text-slate-400">
+            Si aplicas el test en varios computadores simultáneamente, conecta tu proyecto gratuito de Supabase. Si lo dejas vacío, funciona 100% en este navegador.
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <input
+              type="text"
+              id="inputSupabaseUrl"
+              placeholder="Supabase URL (https://xxx.supabase.co)"
+              class="px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+            />
+            <input
+              type="password"
+              id="inputSupabaseKey"
+              placeholder="Supabase Anon Public Key"
+              class="px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+            />
+          </div>
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+            <div class="flex items-center gap-2">
+              <label for="inputNewPin" class="text-xs text-slate-400">PIN Docente:</label>
+              <input
+                type="text"
+                id="inputNewPin"
+                maxlength="8"
+                placeholder="1234"
+                class="w-24 px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white text-center"
+              />
+            </div>
+            <div class="flex items-center gap-2">
+              <button
+                type="button"
+                id="btnSaveSettings"
+                class="px-3.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold transition cursor-pointer"
+              >
+                Guardar Configuración
+              </button>
+              <button
+                type="button"
+                id="btnClearAllData"
+                class="px-3 py-1.5 rounded-lg bg-rose-950/70 hover:bg-rose-900/70 text-rose-300 border border-rose-800/60 text-xs font-medium transition cursor-pointer"
+              >
+                Limpiar Todo
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla Matriz de Contraste -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+        <div class="p-4 sm:p-5 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="text-base font-bold text-white">Matriz de Contraste: Test Vocacional vs. Selección Directa</h3>
+            <p class="text-xs text-slate-400">Diferencia ≥ 3 pts = Interés claro • Diferencia &lt; 3 pts = Perfil mixto</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <select id="filterSection" class="px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white">
+              <option value="ALL">Todas las secciones</option>
+              <option value="8°-1">8°-1</option>
+              <option value="8°-2">8°-2</option>
+              <option value="8°-3">8°-3</option>
+              <option value="8°-4">8°-4</option>
+            </select>
+
+            <select id="filterStatus" class="px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white">
+              <option value="ALL">Todos los estados</option>
+              <option value="COMPLETED">Completados</option>
+              <option value="PENDING">Pendientes</option>
+              <option value="DISCREPANCY">Solo Discrepancias</option>
+            </select>
+
+            <input
+              type="text"
+              id="filterSearch"
+              placeholder="Buscar nombre o ID..."
+              class="px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-500 w-44"
+            />
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-950/90 text-slate-400 border-b border-slate-800 uppercase tracking-wider">
+                <th class="py-3 px-4 font-semibold">Estudiante</th>
+                <th class="py-3 px-3 font-semibold">Sección</th>
+                <th class="py-3 px-3 font-semibold">Puntajes Test (/12)</th>
+                <th class="py-3 px-3 font-semibold">Rama Sugerida (Test)</th>
+                <th class="py-3 px-3 font-semibold">Selección Directa (1ª / 2ª / 3ª)</th>
+                <th class="py-3 px-3 font-semibold">Contraste y Control</th>
+                <th class="py-3 px-3 font-semibold">Rama Final Asignada</th>
+                <th class="py-3 px-3 font-semibold text-right">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="adminTableBody" class="divide-y divide-slate-800/80">
+              <!-- Filas generadas dinámicamente -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal PIN Docente -->
+  <div id="modalPin" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-6 shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-lucide="lock" class="w-4 h-4 text-emerald-400"></i>
+          Acceso Restringido Docente
+        </h3>
+        <button type="button" id="btnClosePinModal" class="text-slate-400 hover:text-white cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <p class="text-xs text-slate-400 mb-4">
+        Ingresa el PIN administrativo para gestionar la base de datos y ver los resultados del test (PIN por defecto: <strong class="text-slate-200">1234</strong>).
+      </p>
+      <form id="formPin" class="space-y-3">
+        <input
+          type="password"
+          id="inputPinCheck"
+          inputmode="numeric"
+          placeholder="••••"
+          class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-center text-lg tracking-widest text-white focus:outline-none focus:border-emerald-500"
+          required
+        />
+        <p id="pinErrorMsg" class="hidden text-xs text-rose-400 text-center">PIN incorrecto. Intenta nuevamente.</p>
+        <button
+          type="submit"
+          class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition cursor-pointer"
+        >
+          Ingresar al Panel
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Confirmación Personalizada (reemplaza window.confirm) -->
+  <div id="modalConfirm" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4">
+      <h3 id="confirmTitle" class="text-base font-bold text-white">Confirmar acción</h3>
+      <p id="confirmMessage" class="text-xs sm:text-sm text-slate-300 leading-relaxed"></p>
+      <div class="flex justify-end gap-2.5 pt-2">
+        <button type="button" id="btnConfirmCancel" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 cursor-pointer">
+          Cancelar
+        </button>
+        <button type="button" id="btnConfirmAccept" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-xs font-semibold text-white cursor-pointer">
+          Confirmar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Acta Individual Imprimible / PDF para firma de acudiente -->
+  <div id="printableActaModal" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div id="printableActaCard" class="bg-white text-slate-900 rounded-2xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-5 my-auto">
+      <div class="flex items-start justify-between border-b-2 border-slate-800 pb-4">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Proceso de Orientación Vocacional • Grado 8°</p>
+          <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 mt-0.5">
+            Acta Individual de Selección de Rama Técnica
+          </h3>
+          <p class="text-xs text-slate-600 mt-0.5">Asignación de Especialidad para Educación Media Técnica (9°, 10° y 11°)</p>
+        </div>
+        <div class="no-print flex items-center gap-2">
+          <button
+            type="button"
+            onclick="window.print()"
+            class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer"
+          >
+            <i data-lucide="printer" class="w-4 h-4"></i>
+            <span>Imprimir / PDF</span>
+          </button>
+          <button
+            type="button"
+            id="btnCloseActaModal"
+            class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 cursor-pointer"
+          >
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="actaBodyContent" class="space-y-4 text-xs sm:text-sm"></div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-10 text-center text-xs text-slate-700">
+        <div class="border-t border-slate-500 pt-2">
+          <p class="font-bold">Firma del Estudiante</p>
+          <p id="actaSignStudentId" class="text-[11px] text-slate-500">T.I. / C.C.</p>
+        </div>
+        <div class="border-t border-slate-500 pt-2">
+          <p class="font-bold">Firma Padre / Acudiente</p>
+          <p class="text-[11px] text-slate-500">C.C.</p>
+        </div>
+        <div class="border-t border-slate-500 pt-2">
+          <p class="font-bold">Orientación / Coord. Técnica</p>
+          <p class="text-[11px] text-slate-500">Vo. Bo. Institucional</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- LÓGICA DE APLICACIÓN JAVASCRIPT (ES6+)                                -->
+  <!-- ===================================================================== -->
+  <script>
+    /**
+     * BANCO OFICIAL DE 27 AFIRMACIONES (Instrumento 1 - Test de Intereses)
+     * - 6 preguntas por Rama (Agropecuaria, Comercial, Industrial, Promoción Social)
+     * - 3 preguntas de Control de Atención (Ítems 9, 18 y 27)
+     */
+    const QUESTIONS_BANK = [
+      { id: 1, rama: 'Agropecuaria', text: 'Me gusta cuidar animales (vacas, cerdos, gallinas, búfalos).' },
+      { id: 2, rama: 'Comercial', text: 'Disfruto vender o convencer a otros de que compren algo.' },
+      { id: 3, rama: 'Industrial', subrama: 'Metalmecánica', text: 'Me gusta desarmar y arreglar aparatos, motos, bicicletas o ventiladores.' },
+      { id: 4, rama: 'Promoción Social', text: 'Me gusta ayudar a las personas de mi barrio o vereda y participar en jornadas comunitarias (limpieza, vacunación).' },
+      { id: 5, rama: 'Agropecuaria', text: 'Me gusta sembrar y cuidar cultivos (arroz, maíz, yuca, ñame, plátano).' },
+      { id: 6, rama: 'Comercial', text: 'Me gusta llevar cuentas: anotar lo que entra y lo que sale de dinero.' },
+      { id: 7, rama: 'Industrial', subrama: 'Electricidad', text: 'Me atrae la electricidad (instalar bombillos, tomas o circuitos).' },
+      { id: 8, rama: 'Promoción Social', text: 'Me interesa saber por qué se enferma la gente de una comunidad y cómo se puede prevenir (dengue, diarreas, gripas).' },
+      { id: 9, rama: 'Control', expected: 1, text: 'Pregunta de atención: para esta afirmación marca «Más o menos».' },
+      { id: 10, rama: 'Agropecuaria', text: 'Me siento bien trabajando al aire libre, con sol y campo.' },
+      { id: 11, rama: 'Comercial', text: 'Me gustaría crear mi propio negocio (tienda, restaurante, venta por internet).' },
+      { id: 12, rama: 'Industrial', subrama: 'Metalmecánica', text: 'Me gustaría aprender a soldar y unir piezas de metal.' },
+      { id: 13, rama: 'Promoción Social', text: 'Me interesa la salud: cuidar niños o adultos mayores y aprender primeros auxilios.' },
+      { id: 14, rama: 'Agropecuaria', text: 'Me interesa la piscicultura (criar bocachico, tilapia u otros peces).' },
+      { id: 15, rama: 'Comercial', text: 'Me interesa aprender cómo funcionan el ahorro, los préstamos y los intereses.' },
+      { id: 16, rama: 'Industrial', subrama: 'Electricidad', text: 'Me interesa cómo funcionan los paneles solares (energía fotovoltaica) y me gustaría aprender a instalarlos.' },
+      { id: 17, rama: 'Promoción Social', text: 'Me interesa aprender sobre el cuidado del cuerpo, la prevención del embarazo adolescente y la salud sexual de los jóvenes.' },
+      { id: 18, rama: 'Control', expected: 0, text: 'Pregunta de atención: para esta afirmación marca «No».' },
+      { id: 19, rama: 'Agropecuaria', text: 'Me interesa cuidar el suelo, el agua y los recursos naturales.' },
+      { id: 20, rama: 'Comercial', text: 'Me gusta atender clientes y organizar pedidos.' },
+      { id: 21, rama: 'Industrial', subrama: 'Metalmecánica', text: 'Me gustaría aprender a manejar máquinas que cortan, taladran o dan forma al metal (como el torno).' },
+      { id: 22, rama: 'Promoción Social', text: 'Me interesa saber cómo el agua sucia, la basura o la contaminación afectan la salud de las personas.' },
+      { id: 23, rama: 'Agropecuaria', text: 'Me gustaría aprender a mejorar la producción de una finca con técnicas modernas.' },
+      { id: 24, rama: 'Comercial', text: 'Me gusta comparar precios y calcular cuánta ganancia deja un negocio.' },
+      { id: 25, rama: 'Industrial', subrama: 'Metalmecánica', text: 'Me gusta trabajar con herramientas y medir con precisión para que una pieza quede exacta.' },
+      { id: 26, rama: 'Promoción Social', text: 'Me da curiosidad conocer los microorganismos (bacterias, virus, hongos) y cómo causan enfermedades.' },
+      { id: 27, rama: 'Control', expected: 2, text: 'Pregunta de atención: para esta afirmación marca «Sí».' }
+    ];
+
+    // Claves de almacenamiento en LocalStorage
+    const STORAGE_KEYS = {
+      STUDENTS: 'inem_ramas_students_v1',
+      RESULTS: 'inem_ramas_results_v1',
+      SETTINGS: 'inem_ramas_settings_v1'
+    };
+
+    // Estado global de la aplicación
+    const AppState = {
+      students: [],
+      results: {}, // Indexado por Numero_Identidad limpio
+      settings: {
+        pin: '1234',
+        maxQuota: 35,
+        supabaseUrl: '',
+        supabaseKey: ''
+      },
+      currentStudent: null,
+      shuffledQuestions: [],
+      studentAnswers: {},
+      currentTestTab: 0,
+      blockStartTime: 0,
+      blockWarned: {},
+      failedAttemptsCurrentSession: 0,
+      currentTestPayload: null
+    };
+
+    // =========================================================================
+    // UTILIDADES DE NORMALIZACIÓN Y PERSISTENCIA (LOCALSTORAGE + SUPABASE)
+    // =========================================================================
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function cleanId(raw) {
+      if (raw === null || raw === undefined) return '';
+      return String(raw).replace(/[\s.\-]/g, '').trim();
+    }
+
+    function normalizeSection(raw) {
+      const s = String(raw || '').trim();
+      if (!s) return '8°-1';
+      if (s.includes('8°')) return s;
+      return `8°-${s.replace(/[^1-4]/g, '') || '1'}`;
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const colors = {
+        success: 'bg-emerald-950/95 border-emerald-500/60 text-emerald-100',
+        error: 'bg-rose-950/95 border-rose-500/60 text-rose-100',
+        warning: 'bg-amber-950/95 border-amber-500/60 text-amber-100',
+        info: 'bg-slate-900/95 border-sky-500/60 text-slate-100'
+      };
+      const icons = {
+        success: 'check-circle',
+        error: 'alert-octagon',
+        warning: 'alert-triangle',
+        info: 'info'
+      };
+
+      const el = document.createElement('div');
+      el.className = `pointer-events-auto border rounded-xl p-3.5 shadow-2xl flex items-start gap-2.5 text-xs sm:text-sm transition-all duration-300 ${colors[type] || colors.info}`;
+      el.innerHTML = `
+        <i data-lucide="${icons[type] || 'info'}" class="w-4 h-4 shrink-0 mt-0.5"></i>
+        <span class="flex-1 leading-snug">${escapeHtml(message)}</span>
+      `;
+      container.appendChild(el);
+      lucide.createIcons();
+
+      setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(8px)';
+        setTimeout(() => el.remove(), 300);
+      }, 4200);
+    }
+
+    function openConfirmModal(title, message, onConfirm) {
+      const modal = document.getElementById('modalConfirm');
+      document.getElementById('confirmTitle').textContent = title;
+      document.getElementById('confirmMessage').textContent = message;
+      modal.classList.remove('hidden');
+
+      const btnAccept = document.getElementById('btnConfirmAccept');
+      const btnCancel = document.getElementById('btnConfirmCancel');
+
+      const cleanup = () => {
+        modal.classList.add('hidden');
+        btnAccept.onclick = null;
+        btnCancel.onclick = null;
+      };
+
+      btnCancel.onclick = cleanup;
+      btnAccept.onclick = () => {
+        cleanup();
+        onConfirm();
+      };
+    }
+
+    function loadState() {
+      try {
+        const savedStudents = localStorage.getItem(STORAGE_KEYS.STUDENTS);
+        const savedResults = localStorage.getItem(STORAGE_KEYS.RESULTS);
+        const savedSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+
+        if (savedStudents) AppState.students = JSON.parse(savedStudents);
+        if (savedResults) AppState.results = JSON.parse(savedResults);
+        if (savedSettings) AppState.settings = { ...AppState.settings, ...JSON.parse(savedSettings) };
+      } catch (err) {
+        console.error('Error al cargar estado local:', err);
+      }
+
+      // Cargar datos de demostración iniciales si la base está vacía para probar inmediatamente
+      if (!AppState.students || AppState.students.length === 0) {
+        AppState.students = [
+          { Numero_Identidad: '1001', Nombre_Completo: 'Valentina Gómez Pérez', Grado: '8°', Sección: '8°-1' },
+          { Numero_Identidad: '1002', Nombre_Completo: 'Santiago Martínez Ruiz', Grado: '8°', Sección: '8°-2' },
+          { Numero_Identidad: '1003', Nombre_Completo: 'Camila Andrea Torres', Grado: '8°', Sección: '8°-3' },
+          { Numero_Identidad: '1004', Nombre_Completo: 'Juan David Herrera', Grado: '8°', Sección: '8°-4' }
+        ];
+        saveStudents();
+      }
+
+      updateSyncBadge();
+    }
+
+    function saveStudents() {
+      localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(AppState.students));
+      syncStudentsToSupabase();
+    }
+
+    function saveResults() {
+      localStorage.setItem(STORAGE_KEYS.RESULTS, JSON.stringify(AppState.results));
+    }
+
+    function saveSettings() {
+      localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(AppState.settings));
+      updateSyncBadge();
+    }
+
+    function updateSyncBadge() {
+      const badge = document.getElementById('syncStatusBadge');
+      if (AppState.settings.supabaseUrl && AppState.settings.supabaseKey) {
+        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span> Nube Supabase Conectada`;
+      } else {
+        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Modo Local Activo`;
+      }
+    }
+
+    // Sincronización opcional con Supabase REST API (tabla: orientacion_ramas)
+    async function syncResultToSupabase(docId, payload) {
+      const { supabaseUrl, supabaseKey } = AppState.settings;
+      if (!supabaseUrl || !supabaseKey) return;
+
+      try {
+        const cleanUrl = supabaseUrl.replace(/\/$/, '');
+        await fetch(`${cleanUrl}/rest/v1/orientacion_ramas`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Prefer': 'resolution=merge-duplicates'
+          },
+          body: JSON.stringify({
+            numero_identidad: docId,
+            datos: payload,
+            actualizado_en: new Date().toISOString()
+          })
+        });
+      } catch (err) {
+        console.warn('No se pudo sincronizar con Supabase (respaldo local guardado):', err);
+      }
+    }
+
+    async function syncStudentsToSupabase() {
+      const { supabaseUrl, supabaseKey } = AppState.settings;
+      if (!supabaseUrl || !supabaseKey) return;
+      try {
+        const cleanUrl = supabaseUrl.replace(/\/$/, '');
+        await fetch(`${cleanUrl}/rest/v1/orientacion_estudiantes`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Prefer': 'resolution=merge-duplicates'
+          },
+          body: JSON.stringify(
+            AppState.students.map(s => ({
+              numero_identidad: cleanId(s.Numero_Identidad),
+              nombre_completo: s.Nombre_Completo,
+              grado: s.Grado,
+              seccion: s.Sección
+            }))
+          )
+        });
+      } catch (err) {
+        console.warn('Sync estudiantes Supabase omitido:', err);
+      }
+    }
+
+    async function pullFromSupabaseIfConfigured() {
+      const { supabaseUrl, supabaseKey } = AppState.settings;
+      if (!supabaseUrl || !supabaseKey) return;
+      try {
+        const cleanUrl = supabaseUrl.replace(/\/$/, '');
+        const headers = {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`
+        };
+
+        const [resSt, resData] = await Promise.all([
+          fetch(`${cleanUrl}/rest/v1/orientacion_estudiantes?select=*`, { headers }),
+          fetch(`${cleanUrl}/rest/v1/orientacion_ramas?select=*`, { headers })
+        ]);
+
+        if (resSt.ok) {
+          const rows = await resSt.json();
+          if (Array.isArray(rows) && rows.length > 0) {
+            AppState.students = rows.map(r => ({
+              Numero_Identidad: cleanId(r.numero_identidad),
+              Nombre_Completo: r.nombre_completo,
+              Grado: r.grado,
+              Sección: r.seccion
+            }));
+            localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(AppState.students));
+          }
+        }
+
+        if (resData.ok) {
+          const rows = await resData.json();
+          if (Array.isArray(rows)) {
+            rows.forEach(r => {
+              if (r.numero_identidad && r.datos) {
+                AppState.results[cleanId(r.numero_identidad)] = r.datos;
+              }
+            });
+            localStorage.setItem(STORAGE_KEYS.RESULTS, JSON.stringify(AppState.results));
+          }
+        }
+      } catch (err) {
+        console.warn('Error al consultar Supabase:', err);
+      }
+    }
+
+    // =========================================================================
+    // NAVEGACIÓN ENTRE VISTAS
+    // =========================================================================
+    function switchView(viewId) {
+      const views = ['viewLogin', 'viewTest', 'viewSelection', 'viewSuccess', 'viewAdmin'];
+      views.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('hidden', id !== viewId);
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      lucide.createIcons();
+    }
+
+    // =========================================================================
+    // ETAPA 1: AUTENTICACIÓN DEL ESTUDIANTE
+    // =========================================================================
+    document.getElementById('formLogin').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const inputEl = document.getElementById('inputDocumento');
+      const errorEl = document.getElementById('loginErrorMsg');
+      const docId = cleanId(inputEl.value);
+
+      errorEl.classList.add('hidden');
+
+      if (!docId) {
+        errorEl.querySelector('span').textContent = 'Por favor digita tu número de identidad.';
+        errorEl.classList.remove('hidden');
+        return;
+      }
+
+      await pullFromSupabaseIfConfigured();
+
+      const student = AppState.students.find(s => cleanId(s.Numero_Identidad) === docId);
+
+      if (!student) {
+        errorEl.querySelector('span').textContent = 'El número de identidad digitado no se encuentra registrado en Grado 8°. Verifica los números o consulta con tu docente.';
+        errorEl.classList.remove('hidden');
+        return;
+      }
+
+      // Verificar si ya completó el proceso previamente
+      const existingResult = AppState.results[docId];
+      if (existingResult && existingResult.completed) {
+        errorEl.querySelector('span').textContent = `Hola ${student.Nombre_Completo}, ya registraste tus respuestas y selección de Rama (${existingResult.selection.option1}). Si hubo un error, solicita al docente reiniciar tu registro.`;
+        errorEl.classList.remove('hidden');
+        return;
+      }
+
+      // Iniciar sesión de estudiante
+      AppState.currentStudent = {
+        ...student,
+        Numero_Identidad: docId
+      };
+      AppState.failedAttemptsCurrentSession = 0;
+      AppState.currentTestPayload = null;
+
+      document.getElementById('studentNameDisplay').textContent = student.Nombre_Completo;
+      document.getElementById('studentIdDisplay').textContent = docId;
+      document.getElementById('studentGradeDisplay').textContent = student.Grado || '8°';
+      document.getElementById('studentSectionDisplay').textContent = normalizeSection(student.Sección);
+      document.getElementById('studentAvatar').textContent = normalizeSection(student.Sección).replace('8°-', '8-');
+
+      document.getElementById('attentionRestartBanner').classList.add('hidden');
+      document.getElementById('inputFinalReflection').value = '';
+      initShuffledTest();
+      switchView('viewTest');
+    });
+
+    document.getElementById('btnLogoutStudent').addEventListener('click', () => {
+      AppState.currentStudent = null;
+      document.getElementById('inputDocumento').value = '';
+      switchView('viewLogin');
+    });
+
+    // =========================================================================
+    // ETAPA 2: TEST DE INTERESES (27 AFIRMACIONES + CONTROL DE LECTURA)
+    // =========================================================================
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function initShuffledTest() {
+      AppState.shuffledQuestions = shuffleArray(QUESTIONS_BANK);
+      AppState.studentAnswers = {};
+      AppState.currentTestTab = 0;
+      AppState.blockStartTime = Date.now();
+      AppState.blockWarned = {};
+      renderTestQuestions();
+      updateTestProgress();
+    }
+
+    function renderTestQuestions() {
+      const container = document.getElementById('questionsContainer');
+      container.innerHTML = '';
+
+      const startIdx = AppState.currentTestTab * 9;
+      const endIdx = startIdx + 9;
+      const slice = AppState.shuffledQuestions.slice(startIdx, endIdx);
+
+      slice.forEach((q, localIndex) => {
+        const globalIndex = startIdx + localIndex;
+        const selectedVal = AppState.studentAnswers[q.id];
+        const card = document.createElement('div');
+        card.id = `q-card-${q.id}`;
+        card.className = `bg-slate-900/90 border ${selectedVal !== undefined ? 'border-emerald-500/40' : 'border-slate-800'} rounded-2xl p-4 sm:p-5 transition`;
+
+        const options = [
+          { label: 'Sí', value: 2 },
+          { label: 'Más o menos', value: 1 },
+          { label: 'No', value: 0 }
+        ];
+
+        card.innerHTML = `
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-lg bg-slate-800 text-slate-300 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
+                ${globalIndex + 1}
+              </span>
+              <p class="text-sm sm:text-base font-medium text-slate-100 leading-snug">
+                ${escapeHtml(q.text)}
+              </p>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 shrink-0 md:w-80">
+              ${options.map(opt => {
+                const isChecked = selectedVal === opt.value;
+                return `
+                  <label class="cursor-pointer">
+                    <input
+                      type="radio"
+                      name="q_${q.id}"
+                      value="${opt.value}"
+                      class="sr-only"
+                      ${isChecked ? 'checked' : ''}
+                      onchange="handleSelectAnswer(${q.id}, ${opt.value})"
+                    />
+                    <div class="text-center py-2.5 px-2 rounded-xl text-xs sm:text-sm font-semibold border transition select-none ${
+                      isChecked
+                        ? 'bg-emerald-600 border-emerald-400 text-white shadow-md shadow-emerald-950/60'
+                        : 'bg-slate-950 border-slate-700/80 text-slate-300 hover:border-slate-500'
+                    }">
+                      ${opt.label}
+                    </div>
+                  </label>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      updateTestTabControls();
+    }
+
+    function updateTestTabControls() {
+      const tab = AppState.currentTestTab;
+
+      // Actualizar estado visual de las 3 pestañas
+      for (let i = 0; i < 3; i++) {
+        const btn = document.getElementById(`tabBtn${i}`);
+        const slice = AppState.shuffledQuestions.slice(i * 9, i * 9 + 9);
+        const blockDone = slice.every(q => AppState.studentAnswers[q.id] !== undefined);
+
+        if (i === tab) {
+          btn.className = 'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold border transition flex items-center justify-center gap-2 cursor-pointer bg-emerald-600/20 border-emerald-500 text-emerald-300';
+        } else if (blockDone) {
+          btn.className = 'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold border transition flex items-center justify-center gap-2 cursor-pointer bg-slate-900 border-emerald-500/40 text-emerald-400';
+        } else {
+          btn.className = 'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold border transition flex items-center justify-center gap-2 cursor-pointer bg-slate-950 border-slate-800 text-slate-400';
+        }
+      }
+
+      // Mostrar/ocultar botones de navegación y reflexión final
+      document.getElementById('btnPrevBlock').classList.toggle('hidden', tab === 0);
+      document.getElementById('btnNextBlock').classList.toggle('hidden', tab === 2);
+      document.getElementById('finalReflectionBox').classList.toggle('hidden', tab !== 2);
+      document.getElementById('btnSubmitTest').classList.toggle('hidden', tab !== 2);
+      lucide.createIcons();
+    }
+
+    function validateCurrentBlockAnswered() {
+      const startIdx = AppState.currentTestTab * 9;
+      const slice = AppState.shuffledQuestions.slice(startIdx, startIdx + 9);
+      const unanswered = slice.find(q => AppState.studentAnswers[q.id] === undefined);
+
+      if (unanswered) {
+        const el = document.getElementById(`q-card-${unanswered.id}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.classList.add('border-rose-500');
+          setTimeout(() => el.classList.remove('border-rose-500'), 2500);
+        }
+        showToast(`Responde las 9 afirmaciones del Bloque ${AppState.currentTestTab + 1} antes de avanzar.`, 'warning');
+        return false;
+      }
+
+      // Control de velocidad mínima por bloque (20 segundos) para evitar respuestas al azar
+      const elapsedSec = (Date.now() - AppState.blockStartTime) / 1000;
+      if (elapsedSec < 20 && !AppState.blockWarned[AppState.currentTestTab]) {
+        AppState.blockWarned[AppState.currentTestTab] = true;
+        showToast('Avanzaste muy rápido. Tómate unos segundos para revisar que leíste bien cada afirmación de este bloque antes de continuar.', 'warning');
+        return false;
+      }
+
+      return true;
+    }
+
+    window.goToTestTab = function(targetTab) {
+      if (targetTab === AppState.currentTestTab) return;
+      if (targetTab > AppState.currentTestTab && !validateCurrentBlockAnswered()) return;
+      AppState.currentTestTab = targetTab;
+      AppState.blockStartTime = Date.now();
+      renderTestQuestions();
+      window.scrollTo({ top: 180, behavior: 'smooth' });
+    };
+
+    document.getElementById('btnPrevBlock').addEventListener('click', () => {
+      if (AppState.currentTestTab > 0) {
+        AppState.currentTestTab--;
+        AppState.blockStartTime = Date.now();
+        renderTestQuestions();
+        window.scrollTo({ top: 180, behavior: 'smooth' });
+      }
+    });
+
+    document.getElementById('btnNextBlock').addEventListener('click', () => {
+      if (AppState.currentTestTab < 2 && validateCurrentBlockAnswered()) {
+        AppState.currentTestTab++;
+        AppState.blockStartTime = Date.now();
+        renderTestQuestions();
+        window.scrollTo({ top: 180, behavior: 'smooth' });
+      }
+    });
+
+    window.handleSelectAnswer = function(questionId, value) {
+      AppState.studentAnswers[questionId] = value;
+      renderTestQuestions();
+      updateTestProgress();
+    };
+
+    function updateTestProgress() {
+      const answeredCount = Object.keys(AppState.studentAnswers).length;
+      const total = QUESTIONS_BANK.length;
+      const pct = Math.round((answeredCount / total) * 100);
+      document.getElementById('testProgressText').textContent = `${answeredCount} / ${total} respondidas`;
+      document.getElementById('testProgressBar').style.width = `${pct}%`;
+    }
+
+    document.getElementById('formTest').addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      // 1. Verificar que todas las 27 preguntas estén respondidas
+      const firstUnansweredIndex = AppState.shuffledQuestions.findIndex(
+        q => AppState.studentAnswers[q.id] === undefined
+      );
+
+      if (firstUnansweredIndex !== -1) {
+        const targetTab = Math.floor(firstUnansweredIndex / 9);
+        AppState.currentTestTab = targetTab;
+        renderTestQuestions();
+
+        const unanswered = AppState.shuffledQuestions[firstUnansweredIndex];
+        const el = document.getElementById(`q-card-${unanswered.id}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.classList.add('border-rose-500');
+          setTimeout(() => el.classList.remove('border-rose-500'), 2500);
+        }
+        showToast(`Faltan afirmaciones por responder en el Bloque ${targetTab + 1}.`, 'warning');
+        return;
+      }
+
+      // Control de velocidad en el Bloque 3 antes de finalizar
+      if (!validateCurrentBlockAnswered()) return;
+
+      // 2. Verificar pregunta final abierta (obligatoria y coherente)
+      const reflectionInput = document.getElementById('inputFinalReflection');
+      const reflectionErr = document.getElementById('reflectionError');
+      const reflectionText = reflectionInput.value.trim();
+
+      reflectionErr.classList.add('hidden');
+
+      if (reflectionText.length < 10 || !/[a-zA-ZáéíóúÁÉÍÓÚñÑ]{3,}/.test(reflectionText)) {
+        reflectionErr.textContent = 'Por favor escribe una respuesta clara indicando con qué afirmación te identificaste más y por qué.';
+        reflectionErr.classList.remove('hidden');
+        reflectionInput.focus();
+        return;
+      }
+
+      // 3. Evaluar preguntas de Control de Atención (9 = Más o menos [1], 18 = No [0], 27 = Sí [2])
+      const controlQuestions = QUESTIONS_BANK.filter(q => q.rama === 'Control');
+      let controlErrors = 0;
+      controlQuestions.forEach(cq => {
+        if (AppState.studentAnswers[cq.id] !== cq.expected) {
+          controlErrors++;
+        }
+      });
+
+      // Según la hoja de corrección: si falla 2 o más preguntas de control, el test no es válido y se repite
+      if (controlErrors >= 2) {
+        AppState.failedAttemptsCurrentSession++;
+        document.getElementById('attentionRestartBanner').classList.remove('hidden');
+        showToast('No superaste el control de lectura. El test se ha reiniciado con nuevo orden.', 'error');
+        initShuffledTest();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      // 4. Calcular puntajes por Rama (máximo 12 puntos por Rama) y desglose Industrial (Metalmecánica vs Electricidad)
+      const scores = {
+        Agropecuaria: 0,
+        Comercial: 0,
+        Industrial: 0,
+        'Promoción Social': 0
+      };
+      const industrialSubScores = {
+        Metalmecánica: 0, // 4 ítems -> máx 8 pts
+        Electricidad: 0   // 2 ítems -> máx 4 pts
+      };
+
+      const vocationalValues = [];
+      QUESTIONS_BANK.forEach(q => {
+        if (q.rama !== 'Control') {
+          const val = AppState.studentAnswers[q.id] || 0;
+          scores[q.rama] += val;
+          vocationalValues.push(val);
+          if (q.rama === 'Industrial' && q.subrama) {
+            industrialSubScores[q.subrama] += val;
+          }
+        }
+      });
+
+      // Detección de respuestas planas (Straight-lining: marcar exactamente lo mismo en las 24 afirmaciones)
+      const uniqueVocationalChoices = new Set(vocationalValues);
+      const isFlatPattern = uniqueVocationalChoices.size === 1;
+      const flatOptionLabel = isFlatPattern
+        ? (vocationalValues[0] === 2 ? 'Todo Sí' : vocationalValues[0] === 1 ? 'Todo Más o menos' : 'Todo No')
+        : null;
+
+      // Porcentajes de afinidad en subramas industriales
+      const industrialAffinityPct = {
+        Metalmecánica: Math.round((industrialSubScores.Metalmecánica / 8) * 100),
+        Electricidad: Math.round((industrialSubScores.Electricidad / 4) * 100)
+      };
+
+      // Determinar Rama más alta y si es Interés claro (diferencia >= 3) o Perfil mixto
+      const sortedRamas = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+      const highestScore = sortedRamas[0][1];
+      const secondHighestScore = sortedRamas[1][1];
+      const diff = highestScore - secondHighestScore;
+
+      const tiedTop = sortedRamas.filter(([, sc]) => sc === highestScore).map(([r]) => r);
+      const suggestedRama = tiedTop.join(' / ');
+      const profileType = diff >= 3 ? 'Interés claro' : 'Perfil mixto';
+
+      AppState.currentTestPayload = {
+        scores,
+        industrialSubScores,
+        industrialAffinityPct,
+        isFlatPattern,
+        flatOptionLabel,
+        suggestedRama,
+        topRamaRaw: sortedRamas[0][0],
+        tiedTop,
+        profileType,
+        scoreDifference: diff,
+        controlErrors,
+        failedAttempts: AppState.failedAttemptsCurrentSession,
+        reflection: reflectionText,
+        answersMap: { ...AppState.studentAnswers }
+      };
+
+      // Resetear selectores de vista 3 y habilitar todas sus opciones
+      ['selectOpt1', 'selectOpt2', 'selectOpt3'].forEach(selId => {
+        const sel = document.getElementById(selId);
+        sel.value = '';
+        Array.from(sel.options).forEach(opt => {
+          opt.disabled = false;
+        });
+      });
+      document.getElementById('selectionErrorMsg').classList.add('hidden');
+
+      switchView('viewSelection');
+    });
+
+    // =========================================================================
+    // ETAPA 3: SELECCIÓN DIRECTA DE RAMA TÉCNICA (3 OPCIONES PRIORIZADAS)
+    // =========================================================================
+    const selectIds = ['selectOpt1', 'selectOpt2', 'selectOpt3'];
+
+    // Evitar visualmente que seleccione la misma Rama en dos casillas
+    selectIds.forEach(id => {
+      document.getElementById(id).addEventListener('change', () => {
+        const chosen = selectIds.map(sId => document.getElementById(sId).value).filter(Boolean);
+        selectIds.forEach(sId => {
+          const sel = document.getElementById(sId);
+          const currentVal = sel.value;
+          Array.from(sel.options).forEach(opt => {
+            if (!opt.value) return;
+            opt.disabled = chosen.includes(opt.value) && opt.value !== currentVal;
+          });
+        });
+      });
+    });
+
+    document.getElementById('formSelection').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errEl = document.getElementById('selectionErrorMsg');
+      errEl.classList.add('hidden');
+
+      const opt1 = document.getElementById('selectOpt1').value;
+      const opt2 = document.getElementById('selectOpt2').value;
+      const opt3 = document.getElementById('selectOpt3').value;
+
+      if (!opt1 || !opt2 || !opt3) {
+        errEl.querySelector('span').textContent = 'Debes seleccionar tus 3 opciones en orden de preferencia antes de enviar.';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      if (new Set([opt1, opt2, opt3]).size < 3) {
+        errEl.querySelector('span').textContent = 'No puedes repetir la misma Rama Técnica en tus opciones.';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      const st = AppState.currentStudent;
+      const testData = AppState.currentTestPayload;
+
+      // Normalizar Industrial - Metalmecánica / Electricidad hacia "Industrial" para contrastar con el Test
+      const normalizedOpt1 = opt1.startsWith('Industrial') ? 'Industrial' : opt1;
+      const isCoincident = testData.tiedTop.includes(normalizedOpt1);
+
+      const finalRecord = {
+        Numero_Identidad: st.Numero_Identidad,
+        Nombre_Completo: st.Nombre_Completo,
+        Grado: st.Grado || '8°',
+        Sección: normalizeSection(st.Sección),
+        completed: true,
+        timestamp: new Date().toLocaleString('es-CO'),
+        test: testData,
+        selection: {
+          option1: opt1,
+          option2: opt2,
+          option3: opt3
+        },
+        coincidence: isCoincident ? 'Coincide' : 'Discrepancia',
+        assignedRama: isCoincident ? opt1 : 'Por definir (Revisar)'
+      };
+
+      AppState.results[st.Numero_Identidad] = finalRecord;
+      saveResults();
+      await syncResultToSupabase(st.Numero_Identidad, finalRecord);
+
+      // Llenar comprobante ciego (sin revelar resultados del test)
+      document.getElementById('receiptName').textContent = st.Nombre_Completo;
+      document.getElementById('receiptMeta').textContent = `ID ${st.Numero_Identidad} • ${normalizeSection(st.Sección)}`;
+      document.getElementById('receiptOpt1').textContent = opt1;
+      document.getElementById('receiptOpt2').textContent = opt2;
+      document.getElementById('receiptOpt3').textContent = opt3;
+
+      AppState.currentStudent = null;
+      switchView('viewSuccess');
+    });
+
+    document.getElementById('btnFinishAndReset').addEventListener('click', () => {
+      document.getElementById('inputDocumento').value = '';
+      switchView('viewLogin');
+    });
+
+    // =========================================================================
+    // PANEL ADMINISTRATIVO DOCENTE (PIN, EXCEL, CONTRASTE, EXPORTACIÓN)
+    // =========================================================================
+    document.getElementById('btnOpenAdmin').addEventListener('click', () => {
+      document.getElementById('inputPinCheck').value = '';
+      document.getElementById('pinErrorMsg').classList.add('hidden');
+      document.getElementById('modalPin').classList.remove('hidden');
+      setTimeout(() => document.getElementById('inputPinCheck').focus(), 100);
+    });
+
+    document.getElementById('btnClosePinModal').addEventListener('click', () => {
+      document.getElementById('modalPin').classList.add('hidden');
+    });
+
+    document.getElementById('formPin').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const enteredPin = document.getElementById('inputPinCheck').value.trim();
+      if (enteredPin !== AppState.settings.pin) {
+        document.getElementById('pinErrorMsg').classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('modalPin').classList.add('hidden');
+      document.getElementById('inputSupabaseUrl').value = AppState.settings.supabaseUrl || '';
+      document.getElementById('inputSupabaseKey').value = AppState.settings.supabaseKey || '';
+      document.getElementById('inputNewPin').value = AppState.settings.pin || '1234';
+      document.getElementById('inputMaxQuota').value = AppState.settings.maxQuota || 35;
+
+      await pullFromSupabaseIfConfigured();
+      renderAdminDashboard();
+      switchView('viewAdmin');
+    });
+
+    document.getElementById('btnCloseAdmin').addEventListener('click', () => {
+      switchView('viewLogin');
+    });
+
+    // Guardar configuración (Supabase y PIN)
+    document.getElementById('btnSaveSettings').addEventListener('click', async () => {
+      const url = document.getElementById('inputSupabaseUrl').value.trim();
+      const key = document.getElementById('inputSupabaseKey').value.trim();
+      const newPin = document.getElementById('inputNewPin').value.trim();
+
+      if (newPin && newPin.length >= 4) {
+        AppState.settings.pin = newPin;
+      }
+      AppState.settings.supabaseUrl = url;
+      AppState.settings.supabaseKey = key;
+      saveSettings();
+
+      if (url && key) {
+        await syncStudentsToSupabase();
+        await pullFromSupabaseIfConfigured();
+        renderAdminDashboard();
+      }
+      showToast('Configuración guardada correctamente.', 'success');
+    });
+
+    // Descargar plantilla Excel de ejemplo con los encabezados exactos del usuario
+    document.getElementById('btnDownloadTemplate').addEventListener('click', () => {
+      const sampleData = [
+        { Numero_Identidad: '1067000001', Nombre_Completo: 'Ejemplo Estudiante Uno', Grado: '8°', Sección: '8°-1' },
+        { Numero_Identidad: '1067000002', Nombre_Completo: 'Ejemplo Estudiante Dos', Grado: '8°', Sección: '8°-2' },
+        { Numero_Identidad: '1067000003', Nombre_Completo: 'Ejemplo Estudiante Tres', Grado: '8°', Sección: '8°-3' },
+        { Numero_Identidad: '1067000004', Nombre_Completo: 'Ejemplo Estudiante Cuatro', Grado: '8°', Sección: '8°-4' }
+      ];
+      const ws = XLSX.utils.json_to_sheet(sampleData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Estudiantes_8');
+      XLSX.writeFile(wb, 'Plantilla_Estudiantes_Grado8.xlsx');
+    });
+
+    // Importar base de datos de estudiantes desde Excel / CSV
+    document.getElementById('inputExcelFile').addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      try {
+        const buffer = await file.arrayBuffer();
+        const wb = XLSX.read(new Uint8Array(buffer), { type: 'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+
+        if (!rows.length) {
+          showToast('El archivo seleccionado está vacío.', 'warning');
+          e.target.value = '';
+          return;
+        }
+
+        const firstRowKeys = Object.keys(rows[0]).map(k => k.trim().toLowerCase());
+        const hasIdCol = firstRowKeys.some(k => ['numero_identidad', 'documento', 'identidad'].includes(k));
+        const hasNameCol = firstRowKeys.some(k => ['nombre_completo', 'nombres', 'nombre'].includes(k));
+
+        if (!hasIdCol || !hasNameCol) {
+          showToast('Estructura inválida: el archivo debe contener las columnas Numero_Identidad y Nombre_Completo.', 'error');
+          e.target.value = '';
+          return;
+        }
+
+        const importedMap = new Map();
+        AppState.students.forEach(s => importedMap.set(cleanId(s.Numero_Identidad), s));
+
+        let addedOrUpdated = 0;
+        let skippedRows = 0;
+        rows.forEach(row => {
+          const docId = cleanId(row.Numero_Identidad || row.Documento || row.Identidad || '');
+          const name = String(row.Nombre_Completo || row.Nombres || row.Nombre || '').trim();
+          if (!docId || !name) {
+            skippedRows++;
+            return;
+          }
+
+          importedMap.set(docId, {
+            Numero_Identidad: docId,
+            Nombre_Completo: name,
+            Grado: String(row.Grado || '8°').trim(),
+            Sección: normalizeSection(row.Sección || row.Seccion || '8°-1')
+          });
+          addedOrUpdated++;
+        });
+
+        AppState.students = Array.from(importedMap.values());
+        saveStudents();
+        renderAdminDashboard();
+        const extraMsg = skippedRows > 0 ? ` (${skippedRows} filas incompletas omitidas)` : '';
+        showToast(`Se cargaron ${addedOrUpdated} estudiantes correctamente${extraMsg}. Total en base: ${AppState.students.length}.`, 'success');
+      } catch (err) {
+        console.error(err);
+        showToast('Error al leer el archivo Excel. Verifica que no esté dañado o protegido con contraseña.', 'error');
+      }
+      e.target.value = '';
+    });
+
+    // Actualizar cupo máximo por Rama
+    document.getElementById('inputMaxQuota').addEventListener('change', (e) => {
+      const val = parseInt(e.target.value, 10);
+      AppState.settings.maxQuota = (!isNaN(val) && val > 0) ? val : 35;
+      e.target.value = AppState.settings.maxQuota;
+      saveSettings();
+      renderAdminDashboard();
+    });
+
+    // Asistente de Distribución Inteligente respetando cupo máximo (35 por Rama)
+    document.getElementById('btnSmartDistribute').addEventListener('click', async () => {
+      const maxQuota = AppState.settings.maxQuota || 35;
+      const ramas = [
+        'Agropecuaria',
+        'Comercial',
+        'Industrial - Metalmecánica',
+        'Industrial - Electricidad',
+        'Promoción Social'
+      ];
+      const counts = {
+        'Agropecuaria': 0,
+        'Comercial': 0,
+        'Industrial - Metalmecánica': 0,
+        'Industrial - Electricidad': 0,
+        'Promoción Social': 0
+      };
+
+      const completedList = AppState.students
+        .map(st => AppState.results[cleanId(st.Numero_Identidad)])
+        .filter(r => r && r.completed);
+
+      if (!completedList.length) {
+        showToast('Aún no hay estudiantes completados para distribuir.', 'warning');
+        return;
+      }
+
+      // Reiniciar asignaciones antes de correr el algoritmo
+      completedList.forEach(r => {
+        r.assignedRama = 'Por definir (Revisar)';
+      });
+
+      // Prioridad 1: Coincidencia exacta (Test == 1.ª opción), ordenados por mayor puntaje vocacional
+      const prio1 = completedList
+        .filter(r => r.coincidence === 'Coincide')
+        .sort((a, b) => (b.test.scores[b.test.topRamaRaw] || 0) - (a.test.scores[a.test.topRamaRaw] || 0));
+
+      prio1.forEach(r => {
+        const target = r.selection.option1;
+        if (ramas.includes(target) && counts[target] < maxQuota) {
+          r.assignedRama = target;
+          counts[target]++;
+        }
+      });
+
+      // Prioridad 2: Discrepancia en 1.ª opción, pero su 2.ª opción sí coincide con su perfil vocacional (ordenados por puntaje)
+      const prio2 = completedList
+        .filter(r => {
+          if (r.assignedRama !== 'Por definir (Revisar)') return false;
+          const baseOpt2 = r.selection.option2.startsWith('Industrial') ? 'Industrial' : r.selection.option2;
+          return r.test.tiedTop.includes(baseOpt2);
+        })
+        .sort((a, b) => (b.test.scores[b.test.topRamaRaw] || 0) - (a.test.scores[a.test.topRamaRaw] || 0));
+
+      prio2.forEach(r => {
+        const target = r.selection.option2;
+        if (ramas.includes(target) && counts[target] < maxQuota) {
+          r.assignedRama = target;
+          counts[target]++;
+        }
+      });
+
+      saveResults();
+      for (const r of completedList) {
+        await syncResultToSupabase(r.Numero_Identidad, r);
+      }
+      renderAdminDashboard();
+
+      const assignedTotal = completedList.filter(r => r.assignedRama !== 'Por definir (Revisar)').length;
+      const pendingReview = completedList.length - assignedTotal;
+      showToast(
+        `Distribución aplicada (Cupo máx: ${maxQuota}): ${assignedTotal} asignados automáticamente y ${pendingReview} pendientes en revisión.`,
+        'success'
+      );
+    });
+
+    window.updateAssignedRama = async function(docId, newRama) {
+      if (AppState.results[docId]) {
+        AppState.results[docId].assignedRama = newRama;
+        saveResults();
+        renderAdminDashboard();
+        await syncResultToSupabase(docId, AppState.results[docId]);
+      }
+    };
+
+    window.openActaModal = function(docId) {
+      const st = AppState.students.find(s => cleanId(s.Numero_Identidad) === docId);
+      const res = AppState.results[docId];
+      if (!st || !res || !res.completed) return;
+
+      const s = res.test.scores;
+      const assigned = res.assignedRama || 'Por definir (Revisar)';
+      const metalPct = res.test.industrialAffinityPct?.Metalmecánica ?? 0;
+      const elecPct = res.test.industrialAffinityPct?.Electricidad ?? 0;
+
+      document.getElementById('actaSignStudentId').textContent = `Doc: ${docId}`;
+      document.getElementById('actaBodyContent').innerHTML = `
+        <div class="grid grid-cols-2 gap-3 bg-slate-100 p-4 rounded-xl border border-slate-300">
+          <div><span class="text-slate-500 block text-[11px] uppercase">Estudiante</span><strong>${escapeHtml(st.Nombre_Completo)}</strong></div>
+          <div><span class="text-slate-500 block text-[11px] uppercase">Documento / Sección</span><strong>${escapeHtml(docId)} • ${escapeHtml(normalizeSection(st.Sección))}</strong></div>
+          <div><span class="text-slate-500 block text-[11px] uppercase">Fecha de Aplicación</span><span>${escapeHtml(res.timestamp)}</span></div>
+          <div><span class="text-slate-500 block text-[11px] uppercase">Rama Técnica Asignada</span><strong class="text-emerald-700 text-base">${escapeHtml(assigned)}</strong></div>
+        </div>
+
+        <div class="border border-slate-300 rounded-xl p-4 space-y-2">
+          <h4 class="font-bold text-slate-800 uppercase text-xs">1. Resultados Instrumento de Exploración Vocacional</h4>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
+            <div class="p-2 bg-slate-50 rounded border border-slate-200"><span class="block text-[11px] text-slate-500">Agropecuaria</span><strong>${s.Agropecuaria} / 12</strong></div>
+            <div class="p-2 bg-slate-50 rounded border border-slate-200"><span class="block text-[11px] text-slate-500">Comercial</span><strong>${s.Comercial} / 12</strong></div>
+            <div class="p-2 bg-slate-50 rounded border border-slate-200"><span class="block text-[11px] text-slate-500">Industrial</span><strong>${s.Industrial} / 12</strong><span class="block text-[10px] text-slate-500">Met: ${metalPct}% | Elec: ${elecPct}%</span></div>
+            <div class="p-2 bg-slate-50 rounded border border-slate-200"><span class="block text-[11px] text-slate-500">Prom. Social</span><strong>${s['Promoción Social']} / 12</strong></div>
+          </div>
+          <p class="text-xs text-slate-700 pt-1"><strong>Perfil sugerido:</strong> ${escapeHtml(res.test.suggestedRama)} (${escapeHtml(res.test.profileType)}) • <strong>Contraste con 1.ª opción:</strong> ${escapeHtml(res.coincidence)}</p>
+        </div>
+
+        <div class="border border-slate-300 rounded-xl p-4 space-y-1.5">
+          <h4 class="font-bold text-slate-800 uppercase text-xs">2. Selección Directa del Estudiante</h4>
+          <p><strong>1.ª Opción:</strong> ${escapeHtml(res.selection.option1)} &nbsp;|&nbsp; <strong>2.ª Opción:</strong> ${escapeHtml(res.selection.option2)} &nbsp;|&nbsp; <strong>3.ª Opción:</strong> ${escapeHtml(res.selection.option3)}</p>
+          <p class="text-xs text-slate-600 italic pt-1"><strong>Reflexión del estudiante:</strong> "${escapeHtml(res.test.reflection)}"</p>
+        </div>
+      `;
+
+      document.getElementById('printableActaModal').classList.remove('hidden');
+      lucide.createIcons();
+    };
+
+    document.getElementById('btnCloseActaModal').addEventListener('click', () => {
+      document.getElementById('printableActaModal').classList.add('hidden');
+    });
+
+    function renderComparisonChart(completedRecords) {
+      const container = document.getElementById('comparisonChartContainer');
+      const total = completedRecords.length || 1;
+
+      const categories = [
+        { label: 'Agropecuaria', matchDirect: r => r.selection.option1 === 'Agropecuaria', matchTest: r => r.test.tiedTop.includes('Agropecuaria') },
+        { label: 'Comercial', matchDirect: r => r.selection.option1 === 'Comercial', matchTest: r => r.test.tiedTop.includes('Comercial') },
+        { label: 'Industrial (Metalmecánica + Electricidad)', matchDirect: r => r.selection.option1.startsWith('Industrial'), matchTest: r => r.test.tiedTop.includes('Industrial') },
+        { label: 'Promoción Social', matchDirect: r => r.selection.option1 === 'Promoción Social', matchTest: r => r.test.tiedTop.includes('Promoción Social') }
+      ];
+
+      container.innerHTML = categories.map(cat => {
+        const directCount = completedRecords.filter(cat.matchDirect).length;
+        const testCount = completedRecords.filter(cat.matchTest).length;
+        const directPct = Math.round((directCount / total) * 100);
+        const testPct = Math.round((testCount / total) * 100);
+
+        return `
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs">
+              <span class="font-semibold text-slate-200">${cat.label}</span>
+              <span class="text-slate-400">Directa: <strong class="text-sky-400">${directCount}</strong> (${directPct}%) • Test: <strong class="text-emerald-400">${testCount}</strong> (${testPct}%)</span>
+            </div>
+            <div class="space-y-1">
+              <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                <div class="h-full bg-sky-500 transition-all duration-500" style="width: ${directPct}%"></div>
+              </div>
+              <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                <div class="h-full bg-emerald-500 transition-all duration-500" style="width: ${testPct}%"></div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderAdminDashboard() {
+      const total = AppState.students.length;
+      const completedRecords = AppState.students
+        .map(st => AppState.results[cleanId(st.Numero_Identidad)])
+        .filter(r => r && r.completed);
+
+      const completedCount = completedRecords.length;
+      const pendingCount = total - completedCount;
+      const coincidentCount = completedRecords.filter(r => r.coincidence === 'Coincide').length;
+      const discrepancyCount = completedRecords.filter(r => r.coincidence === 'Discrepancia').length;
+      const coincidencePct = completedCount > 0 ? Math.round((coincidentCount / completedCount) * 100) : 0;
+
+      document.getElementById('kpiTotalStudents').textContent = total;
+      document.getElementById('kpiCompleted').textContent = completedCount;
+      document.getElementById('kpiPending').textContent = pendingCount;
+      document.getElementById('kpiCoincidence').textContent = `${coincidencePct}%`;
+      document.getElementById('kpiDiscrepancy').textContent = discrepancyCount;
+
+      // Actualizar contadores y barras de cupo por Rama
+      const maxQuota = AppState.settings.maxQuota || 35;
+      const distMap = {
+        'Agropecuaria': { countId: 'distAgro', badgeId: 'quotaBadgeAgro', barId: 'barQuotaAgro', color: 'bg-emerald-500' },
+        'Comercial': { countId: 'distComercial', badgeId: 'quotaBadgeComercial', barId: 'barQuotaComercial', color: 'bg-sky-500' },
+        'Industrial - Metalmecánica': { countId: 'distMetal', badgeId: 'quotaBadgeMetal', barId: 'barQuotaMetal', color: 'bg-amber-500' },
+        'Industrial - Electricidad': { countId: 'distElec', badgeId: 'quotaBadgeElec', barId: 'barQuotaElec', color: 'bg-orange-500' },
+        'Promoción Social': { countId: 'distSocial', badgeId: 'quotaBadgeSocial', barId: 'barQuotaSocial', color: 'bg-rose-500' }
+      };
+
+      Object.entries(distMap).forEach(([ramaName, ui]) => {
+        const count = completedRecords.filter(r => r.assignedRama === ramaName).length;
+        const pct = Math.min(100, Math.round((count / maxQuota) * 100));
+        document.getElementById(ui.countId).textContent = count;
+        const badgeEl = document.getElementById(ui.badgeId);
+        badgeEl.textContent = `${count} / ${maxQuota}`;
+        badgeEl.className = `text-[11px] font-bold ${count > maxQuota ? 'text-rose-400' : count >= maxQuota * 0.85 ? 'text-amber-400' : 'text-slate-400'}`;
+
+        const barEl = document.getElementById(ui.barId);
+        barEl.style.width = `${pct}%`;
+        barEl.className = `h-full transition-all duration-300 ${count > maxQuota ? 'bg-rose-500' : count >= maxQuota * 0.85 ? 'bg-amber-400' : ui.color}`;
+      });
+
+      renderComparisonChart(completedRecords);
+
+      // Filtros de la tabla
+      const sectionFilter = document.getElementById('filterSection').value;
+      const statusFilter = document.getElementById('filterStatus').value;
+      const searchFilter = document.getElementById('filterSearch').value.trim().toLowerCase();
+
+      const tbody = document.getElementById('adminTableBody');
+      const filteredStudents = AppState.students.filter(st => {
+        const docId = cleanId(st.Numero_Identidad);
+        const res = AppState.results[docId];
+        const sec = normalizeSection(st.Sección);
+
+        if (sectionFilter !== 'ALL' && sec !== sectionFilter) return false;
+        if (statusFilter === 'COMPLETED' && (!res || !res.completed)) return false;
+        if (statusFilter === 'PENDING' && res && res.completed) return false;
+        if (statusFilter === 'DISCREPANCY' && (!res || res.coincidence !== 'Discrepancia')) return false;
+
+        if (searchFilter) {
+          const matchName = st.Nombre_Completo.toLowerCase().includes(searchFilter);
+          const matchId = docId.includes(searchFilter);
+          if (!matchName && !matchId) return false;
+        }
+        return true;
+      });
+
+      if (filteredStudents.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="py-8 text-center text-slate-400">
+              No hay estudiantes que coincidan con los filtros seleccionados.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      const ramaOptions = [
+        'Por definir (Revisar)',
+        'Agropecuaria',
+        'Comercial',
+        'Industrial - Metalmecánica',
+        'Industrial - Electricidad',
+        'Promoción Social'
+      ];
+
+      tbody.innerHTML = filteredStudents.map(st => {
+        const docId = cleanId(st.Numero_Identidad);
+        const res = AppState.results[docId];
+        const sec = normalizeSection(st.Sección);
+
+        if (!res || !res.completed) {
+          return `
+            <tr class="hover:bg-slate-800/40 transition">
+              <td class="py-3 px-4">
+                <p class="font-semibold text-white">${escapeHtml(st.Nombre_Completo)}</p>
+                <p class="text-[11px] text-slate-400">ID: ${escapeHtml(docId)}</p>
+              </td>
+              <td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300">${escapeHtml(sec)}</span></td>
+              <td colspan="5" class="py-3 px-3 text-amber-400/90 italic">Pendiente por presentar el instrumento</td>
+              <td class="py-3 px-3 text-right text-slate-500">—</td>
+            </tr>
+          `;
+        }
+
+        const s = res.test.scores;
+        const metalPct = res.test.industrialAffinityPct?.Metalmecánica ?? 0;
+        const elecPct = res.test.industrialAffinityPct?.Electricidad ?? 0;
+        const assigned = res.assignedRama || (res.coincidence === 'Coincide' ? res.selection.option1 : 'Por definir (Revisar)');
+
+        return `
+          <tr class="hover:bg-slate-800/40 transition align-top">
+            <td class="py-3 px-4">
+              <p class="font-semibold text-white">${escapeHtml(st.Nombre_Completo)}</p>
+              <p class="text-[11px] text-slate-400">ID: ${escapeHtml(docId)}</p>
+              ${res.test.isFlatPattern ? `<span class="inline-block mt-1 px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 text-[10px]">Alerta: ${escapeHtml(res.test.flatOptionLabel)}</span>` : ''}
+            </td>
+            <td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300">${escapeHtml(sec)}</span></td>
+            <td class="py-3 px-3 space-y-0.5 text-[11px]">
+              <div>Agro: <strong class="text-emerald-300">${s.Agropecuaria}</strong> • Com: <strong class="text-sky-300">${s.Comercial}</strong></div>
+              <div>Ind: <strong class="text-amber-300">${s.Industrial}</strong> <span class="text-slate-400">(Met ${metalPct}% / Elec ${elecPct}%)</span></div>
+              <div>Social: <strong class="text-rose-300">${s['Promoción Social']}</strong></div>
+            </td>
+            <td class="py-3 px-3">
+              <p class="font-bold text-white">${escapeHtml(res.test.suggestedRama)}</p>
+              <span class="inline-block mt-0.5 px-2 py-0.5 rounded-full text-[10px] ${res.test.profileType === 'Interés claro' ? 'bg-emerald-500/15 text-emerald-300' : 'bg-amber-500/15 text-amber-300'}">
+                ${escapeHtml(res.test.profileType)}
+              </span>
+            </td>
+            <td class="py-3 px-3 space-y-0.5 text-[11px]">
+              <p><strong class="text-emerald-400">1ª:</strong> ${escapeHtml(res.selection.option1)}</p>
+              <p><strong class="text-sky-400">2ª:</strong> ${escapeHtml(res.selection.option2)}</p>
+              <p><strong class="text-amber-400">3ª:</strong> ${escapeHtml(res.selection.option3)}</p>
+            </td>
+            <td class="py-3 px-3 space-y-1">
+              <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold ${res.coincidence === 'Coincide' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'}">
+                ${escapeHtml(res.coincidence)}
+              </span>
+              <p class="text-[10px] text-slate-400">Control: ${res.test.controlErrors} err • Reinicios: ${res.test.failedAttempts}</p>
+              <p class="text-[10px] text-slate-400 italic max-w-[180px] truncate" title="${escapeHtml(res.test.reflection)}">"${escapeHtml(res.test.reflection)}"</p>
+            </td>
+            <td class="py-3 px-3">
+              <select
+                onchange="updateAssignedRama('${escapeHtml(docId)}', this.value)"
+                class="px-2.5 py-1.5 rounded-lg bg-slate-950 border ${assigned === 'Por definir (Revisar)' ? 'border-amber-500/60 text-amber-300' : 'border-emerald-500/50 text-emerald-300'} text-[11px] font-semibold focus:outline-none"
+              >
+                ${ramaOptions.map(opt => `<option value="${escapeHtml(opt)}" ${assigned === opt ? 'selected' : ''}>${escapeHtml(opt)}</option>`).join('')}
+              </select>
+            </td>
+            <td class="py-3 px-3 text-right space-y-1.5">
+              <button
+                type="button"
+                onclick="openActaModal('${escapeHtml(docId)}')"
+                class="px-2.5 py-1 rounded-lg bg-sky-600/20 hover:bg-sky-600/40 text-sky-300 border border-sky-500/40 text-[11px] font-semibold transition inline-flex items-center gap-1 cursor-pointer"
+                title="Generar Acta Imprimible / PDF"
+              >
+                <i data-lucide="printer" class="w-3 h-3"></i>
+                <span>Acta</span>
+              </button>
+              <button
+                type="button"
+                onclick="resetStudentAttempt('${escapeHtml(docId)}')"
+                class="block ml-auto px-2 py-1 rounded-lg bg-slate-800 hover:bg-rose-950 text-slate-400 hover:text-rose-300 text-[10px] transition cursor-pointer"
+                title="Permitir que el estudiante vuelva a realizar el test"
+              >
+                Reiniciar
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    // Eventos de filtrado en tiempo real
+    ['filterSection', 'filterStatus'].forEach(id => {
+      document.getElementById(id).addEventListener('change', renderAdminDashboard);
+    });
+    document.getElementById('filterSearch').addEventListener('input', renderAdminDashboard);
+
+    // Reiniciar intento de un estudiante individual
+    window.resetStudentAttempt = function(docId) {
+      const st = AppState.students.find(s => cleanId(s.Numero_Identidad) === docId);
+      openConfirmModal(
+        'Reiniciar registro de estudiante',
+        `¿Deseas eliminar las respuestas de ${st ? st.Nombre_Completo : docId} para que pueda volver a presentar el test y elegir Rama?`,
+        async () => {
+          delete AppState.results[docId];
+          saveResults();
+          await syncResultToSupabase(docId, null);
+          renderAdminDashboard();
+          showToast('Registro del estudiante reiniciado.', 'info');
+        }
+      );
+    };
+
+    // Fusión de múltiples archivos Excel exportados desde varios equipos
+    document.getElementById('inputMergeExcel').addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files || []);
+      if (!files.length) return;
+
+      let mergedCount = 0;
+      let skippedCount = 0;
+      const studentMap = new Map();
+      AppState.students.forEach(s => studentMap.set(cleanId(s.Numero_Identidad), s));
+
+      for (const file of files) {
+        try {
+          const buffer = await file.arrayBuffer();
+          const wb = XLSX.read(new Uint8Array(buffer), { type: 'array' });
+          const sheetName = wb.SheetNames.find(n => n.toLowerCase().includes('consolidado')) || wb.SheetNames[0];
+          const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], { defval: '' });
+
+          rows.forEach(row => {
+            const docId = cleanId(row.Numero_Identidad || row.Documento || '');
+            const estado = String(row.Estado || '').trim().toLowerCase();
+            if (!docId || estado !== 'completado') return;
+
+            const studentName = String(row.Nombre_Completo || '').trim();
+            const studentGrade = String(row.Grado || '8°').trim();
+            const studentSec = normalizeSection(row.Sección || '8°-1');
+
+            // Asegurar que el estudiante exista en la lista maestra aunque no haya sido importado antes en este PC
+            if (!studentMap.has(docId) && studentName) {
+              studentMap.set(docId, {
+                Numero_Identidad: docId,
+                Nombre_Completo: studentName,
+                Grado: studentGrade,
+                Sección: studentSec
+              });
+            }
+
+            if (AppState.results[docId] && AppState.results[docId].completed) {
+              skippedCount++;
+              return;
+            }
+
+            const scores = {
+              Agropecuaria: Number(row.Pts_Agropecuaria || 0),
+              Comercial: Number(row.Pts_Comercial || 0),
+              Industrial: Number(row.Pts_Industrial || 0),
+              'Promoción Social': Number(row.Pts_Promocion_Social || 0)
+            };
+
+            const sortedRamas = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+            const topScore = sortedRamas[0][1];
+            const tiedTop = sortedRamas.filter(([, sc]) => sc === topScore).map(([r]) => r);
+            const opt1 = String(row.Seleccion_1ra_Opcion || '');
+            const opt2 = String(row.Seleccion_2da_Opcion || '');
+            const opt3 = String(row.Seleccion_3ra_Opcion || '');
+            const normalizedOpt1 = opt1.startsWith('Industrial') ? 'Industrial' : opt1;
+            const isCoincident = tiedTop.includes(normalizedOpt1);
+
+            AppState.results[docId] = {
+              Numero_Identidad: docId,
+              Nombre_Completo: studentName,
+              Grado: studentGrade,
+              Sección: studentSec,
+              completed: true,
+              timestamp: String(row.Fecha_Registro || new Date().toLocaleString('es-CO')),
+              test: {
+                scores,
+                industrialAffinityPct: {
+                  Metalmecánica: Number(String(row.Afinidad_Metalmecanica || '0').replace('%', '')),
+                  Electricidad: Number(String(row.Afinidad_Electricidad || '0').replace('%', ''))
+                },
+                isFlatPattern: String(row.Patron_Respuestas || '').toLowerCase().includes('alerta'),
+                flatOptionLabel: String(row.Patron_Respuestas || '').replace('Alerta: ', ''),
+                suggestedRama: String(row.Rama_Sugerida_Test || tiedTop.join(' / ')),
+                topRamaRaw: sortedRamas[0][0],
+                tiedTop,
+                profileType: String(row.Tipo_Perfil || 'Interés claro'),
+                controlErrors: Number(row.Errores_Control_Lectura || 0),
+                failedAttempts: Number(row.Intentos_Reiniciados || 0),
+                reflection: String(row.Reflexion_Final || '')
+              },
+              selection: { option1: opt1, option2: opt2, option3: opt3 },
+              coincidence: isCoincident ? 'Coincide' : 'Discrepancia',
+              assignedRama: String(row.Rama_Final_Asignada || (isCoincident ? opt1 : 'Por definir (Revisar)'))
+            };
+            mergedCount++;
+          });
+        } catch (err) {
+          console.error('Error al fusionar archivo:', file.name, err);
+          showToast(`No se pudo procesar el archivo ${file.name}.`, 'error');
+        }
+      }
+
+      AppState.students = Array.from(studentMap.values());
+      saveStudents();
+      saveResults();
+      renderAdminDashboard();
+      showToast(`Fusión finalizada: ${mergedCount} registros nuevos integrados (${skippedCount} omitidos por ya existir).`, 'success');
+      e.target.value = '';
+    });
+
+    // Exportar reporte consolidado en Excel (.xlsx) con pestañas por sección y por Rama Técnica
+    document.getElementById('btnExportExcel').addEventListener('click', () => {
+      if (AppState.students.length === 0) {
+        showToast('No hay estudiantes registrados para exportar.', 'warning');
+        return;
+      }
+
+      const buildRow = (st) => {
+        const docId = cleanId(st.Numero_Identidad);
+        const res = AppState.results[docId];
+        if (!res || !res.completed) {
+          return {
+            Numero_Identidad: docId,
+            Nombre_Completo: st.Nombre_Completo,
+            Grado: st.Grado || '8°',
+            Sección: normalizeSection(st.Sección),
+            Estado: 'Pendiente',
+            Pts_Agropecuaria: '',
+            Pts_Comercial: '',
+            Pts_Industrial: '',
+            Afinidad_Metalmecanica: '',
+            Afinidad_Electricidad: '',
+            Pts_Promocion_Social: '',
+            Patron_Respuestas: '',
+            Rama_Sugerida_Test: '',
+            Tipo_Perfil: '',
+            Seleccion_1ra_Opcion: '',
+            Seleccion_2da_Opcion: '',
+            Seleccion_3ra_Opcion: '',
+            Contraste_Test_vs_1ra: '',
+            Rama_Final_Asignada: '',
+            Errores_Control_Lectura: '',
+            Intentos_Reiniciados: '',
+            Reflexion_Final: '',
+            Fecha_Registro: ''
+          };
+        }
+
+        const assigned = res.assignedRama || (res.coincidence === 'Coincide' ? res.selection.option1 : 'Por definir (Revisar)');
+
+        return {
+          Numero_Identidad: docId,
+          Nombre_Completo: st.Nombre_Completo,
+          Grado: st.Grado || '8°',
+          Sección: normalizeSection(st.Sección),
+          Estado: 'Completado',
+          Pts_Agropecuaria: res.test.scores.Agropecuaria,
+          Pts_Comercial: res.test.scores.Comercial,
+          Pts_Industrial: res.test.scores.Industrial,
+          Afinidad_Metalmecanica: `${res.test.industrialAffinityPct?.Metalmecánica ?? 0}%`,
+          Afinidad_Electricidad: `${res.test.industrialAffinityPct?.Electricidad ?? 0}%`,
+          Pts_Promocion_Social: res.test.scores['Promoción Social'],
+          Patron_Respuestas: res.test.isFlatPattern ? `Alerta: ${res.test.flatOptionLabel}` : 'Normal',
+          Rama_Sugerida_Test: res.test.suggestedRama,
+          Tipo_Perfil: res.test.profileType,
+          Seleccion_1ra_Opcion: res.selection.option1,
+          Seleccion_2da_Opcion: res.selection.option2,
+          Seleccion_3ra_Opcion: res.selection.option3,
+          Contraste_Test_vs_1ra: res.coincidence,
+          Rama_Final_Asignada: assigned,
+          Errores_Control_Lectura: res.test.controlErrors,
+          Intentos_Reiniciados: res.test.failedAttempts,
+          Reflexion_Final: res.test.reflection,
+          Fecha_Registro: res.timestamp
+        };
+      };
+
+      const wb = XLSX.utils.book_new();
+      const allRows = AppState.students.map(buildRow);
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(allRows), 'Consolidado_Grado_8');
+
+      // Pestañas por cada Rama Técnica oficial (estudiantes ya distribuidos)
+      const ramasTabs = [
+        { rama: 'Agropecuaria', tabName: 'Rama_Agropecuaria' },
+        { rama: 'Comercial', tabName: 'Rama_Comercial' },
+        { rama: 'Industrial - Metalmecánica', tabName: 'Ind_Metalmecanica' },
+        { rama: 'Industrial - Electricidad', tabName: 'Ind_Electricidad' },
+        { rama: 'Promoción Social', tabName: 'Rama_Prom_Social' }
+      ];
+
+      ramasTabs.forEach(({ rama, tabName }) => {
+        const ramaRows = allRows.filter(r => r.Rama_Final_Asignada === rama);
+        if (ramaRows.length > 0) {
+          XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(ramaRows), tabName);
+        }
+      });
+
+      // Pestaña de casos pendientes por definir / revisar
+      const reviewRows = allRows.filter(r => r.Rama_Final_Asignada === 'Por definir (Revisar)');
+      if (reviewRows.length > 0) {
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(reviewRows), 'Por_Definir_Revisar');
+      }
+
+      // Pestañas adicionales por cada sección
+      ['8°-1', '8°-2', '8°-3', '8°-4'].forEach(sec => {
+        const secRows = allRows.filter(r => r.Sección === sec);
+        if (secRows.length > 0) {
+          XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(secRows), sec.replace('°', ''));
+        }
+      });
+
+      const dateTag = new Date().toISOString().slice(0, 10);
+      XLSX.writeFile(wb, `Resultados_Orientacion_Ramas_8_${dateTag}.xlsx`);
+      showToast('Archivo Excel exportado con hojas por Rama Técnica y por sección.', 'success');
+    });
+
+    // Limpiar todos los datos locales
+    document.getElementById('btnClearAllData').addEventListener('click', () => {
+      openConfirmModal(
+        'Borrar resultados y reiniciar base local',
+        'Esta acción eliminará todas las respuestas de estudiantes almacenadas en este navegador. Si también deseas borrar la lista de matriculados, vuelve a importar tu Excel después. ¿Deseas continuar?',
+        () => {
+          AppState.results = {};
+          saveResults();
+          renderAdminDashboard();
+          showToast('Todos los resultados locales han sido eliminados.', 'warning');
+        }
+      );
+    });
+
+    // Proteger al estudiante contra cierre o recarga accidental mientras responde el test o la selección
+    window.addEventListener('beforeunload', (e) => {
+      if (AppState.currentStudent) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    });
+
+    // Inicialización al cargar la página
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
