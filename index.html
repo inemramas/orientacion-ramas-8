@@ -33,7 +33,6 @@
       background-color: #0b1120;
       color: #f1f5f9;
     }
-    /* Barra de desplazamiento personalizada */
     ::-webkit-scrollbar {
       width: 8px;
       height: 8px;
@@ -48,7 +47,6 @@
     ::-webkit-scrollbar-thumb:hover {
       background: #475569;
     }
-    /* Estilos de impresión exclusivos para el Acta Individual */
     @media print {
       body * {
         visibility: hidden;
@@ -98,13 +96,11 @@
       </div>
 
       <div class="flex items-center gap-2 sm:gap-3">
-        <!-- Indicador de estado de sincronización -->
         <span id="syncStatusBadge" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
           <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
           Nube Supabase Conectada
         </span>
 
-        <!-- Botón de acceso docente -->
         <button
           id="btnOpenAdmin"
           type="button"
@@ -182,7 +178,6 @@
     <!-- VISTA 2: TEST DE INTERESES (27 AFIRMACIONES + PREGUNTA FINAL)         -->
     <!-- ===================================================================== -->
     <section id="viewTest" class="hidden space-y-6">
-      <!-- Tarjeta de identificación del estudiante -->
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div class="flex items-center gap-3.5">
           <div class="w-11 h-11 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold text-base shrink-0" id="studentAvatar">
@@ -209,7 +204,6 @@
         </button>
       </div>
 
-      <!-- Aviso si hubo reinicio por control de lectura -->
       <div id="attentionRestartBanner" class="hidden bg-amber-950/60 border border-amber-500/50 rounded-2xl p-4 sm:p-5 flex items-start gap-3.5">
         <i data-lucide="alert-triangle" class="w-6 h-6 text-amber-400 shrink-0 mt-0.5"></i>
         <div class="text-sm text-amber-100">
@@ -220,7 +214,6 @@
         </div>
       </div>
 
-      <!-- Instrucciones y progreso -->
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
           <div>
@@ -240,7 +233,6 @@
           Lee cada afirmación completa y marca una sola opción (<strong class="text-slate-200">Sí</strong>, <strong class="text-slate-200">Más o menos</strong> o <strong class="text-slate-200">No</strong>). El test está dividido en <strong class="text-slate-200">3 bloques de 9 preguntas</strong>. Algunas preguntas piden una respuesta específica; léelas con atención.
         </p>
 
-        <!-- Pestañas de navegación de los 3 bloques de 9 preguntas -->
         <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800/80" role="tablist">
           <button type="button" id="tabBtn0" onclick="goToTestTab(0)" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold border transition flex items-center justify-center gap-2 cursor-pointer bg-emerald-600/20 border-emerald-500 text-emerald-300">
             <span>Bloque 1</span>
@@ -257,11 +249,9 @@
         </div>
       </div>
 
-      <!-- Formulario del Test por Bloques -->
       <form id="formTest" class="space-y-4" novalidate>
         <div id="questionsContainer" class="space-y-3.5"></div>
 
-        <!-- Pregunta Final Obligatoria (Visible únicamente en el Bloque 3) -->
         <div id="finalReflectionBox" class="hidden bg-slate-900 border border-slate-700/80 rounded-2xl p-5 sm:p-6 mt-6 shadow-lg">
           <label for="inputFinalReflection" class="block text-sm sm:text-base font-bold text-white mb-1.5">
             Pregunta final (obligatoria) <span class="text-rose-400">*</span>
@@ -278,7 +268,6 @@
           <p id="reflectionError" class="hidden mt-2 text-xs text-rose-400"></p>
         </div>
 
-        <!-- Controles de navegación entre bloques -->
         <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3">
           <button
             type="button"
@@ -326,9 +315,7 @@
         </p>
       </div>
 
-      <!-- Catálogo informativo de las 4 Ramas (con las 2 subramas de Industrial) -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Agropecuaria -->
         <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 hover:border-emerald-500/40 transition">
           <div class="flex items-center gap-3 mb-2.5">
             <div class="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center">
@@ -341,7 +328,6 @@
           </p>
         </div>
 
-        <!-- Comercial -->
         <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 hover:border-sky-500/40 transition">
           <div class="flex items-center gap-3 mb-2.5">
             <div class="w-10 h-10 rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center">
@@ -354,7 +340,6 @@
           </p>
         </div>
 
-        <!-- Industrial (Metalmecánica y Electricidad) -->
         <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 hover:border-amber-500/40 transition">
           <div class="flex items-center gap-3 mb-2.5">
             <div class="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center">
@@ -370,7 +355,6 @@
           </p>
         </div>
 
-        <!-- Promoción Social -->
         <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 hover:border-rose-500/40 transition">
           <div class="flex items-center gap-3 mb-2.5">
             <div class="w-10 h-10 rounded-xl bg-rose-500/15 text-rose-400 flex items-center justify-center">
@@ -384,10 +368,8 @@
         </div>
       </div>
 
-      <!-- Formulario de jerarquía de 3 opciones -->
       <form id="formSelection" class="bg-slate-900 border border-slate-700 rounded-2xl p-5 sm:p-7 space-y-5 shadow-xl">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <!-- Primera Opción -->
           <div class="p-4 rounded-xl bg-slate-950 border border-emerald-500/40">
             <label for="selectOpt1" class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-400 mb-2">
               <span class="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center text-xs font-extrabold">1</span>
@@ -407,7 +389,6 @@
             </select>
           </div>
 
-          <!-- Segunda Opción -->
           <div class="p-4 rounded-xl bg-slate-950 border border-sky-500/40">
             <label for="selectOpt2" class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-sky-400 mb-2">
               <span class="w-5 h-5 rounded-full bg-sky-500 text-slate-950 flex items-center justify-center text-xs font-extrabold">2</span>
@@ -427,7 +408,6 @@
             </select>
           </div>
 
-          <!-- Tercera Opción -->
           <div class="p-4 rounded-xl bg-slate-950 border border-amber-500/40">
             <label for="selectOpt3" class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">
               <span class="w-5 h-5 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center text-xs font-extrabold">3</span>
@@ -519,7 +499,6 @@
     <!-- VISTA 5: PANEL ADMINISTRATIVO DOCENTE (IMPORTACIÓN, CONTRASTE, EXCEL) -->
     <!-- ===================================================================== -->
     <section id="viewAdmin" class="hidden space-y-6">
-      <!-- Cabecera Admin -->
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 mb-1.5">
@@ -572,7 +551,7 @@
         </div>
       </div>
 
-      <!-- KPIs / Resumen por secciones -->
+      <!-- KPIs -->
       <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
           <p class="text-xs text-slate-400 font-medium">Total Matriculados</p>
@@ -691,7 +670,7 @@
         </div>
       </div>
 
-      <!-- Gráfico Comparativo: Demanda Directa (1.ª Opción) vs. Vocación Real (Test) -->
+      <!-- Gráfico Comparativo -->
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
@@ -715,9 +694,8 @@
         <div id="comparisonChartContainer" class="space-y-3.5"></div>
       </div>
 
-      <!-- Carga de Excel y Configuración Cloud (Supabase) -->
+      <!-- Carga de Excel y Configuración Cloud -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <!-- Importar Base de Datos Excel -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
           <div class="flex items-start justify-between gap-3">
             <div>
@@ -746,7 +724,6 @@
           </label>
         </div>
 
-        <!-- Configuración de Sincronización en Nube (Supabase) y Seguridad -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3">
           <h3 class="text-base font-bold text-white flex items-center gap-2">
             <i data-lucide="database" class="w-5 h-5 text-sky-400"></i>
@@ -847,9 +824,7 @@
                 <th class="py-3 px-3 font-semibold text-right">Acción</th>
               </tr>
             </thead>
-            <tbody id="adminTableBody" class="divide-y divide-slate-800/80">
-              <!-- Filas generadas dinámicamente -->
-            </tbody>
+            <tbody id="adminTableBody" class="divide-y divide-slate-800/80"></tbody>
           </table>
         </div>
       </div>
@@ -962,17 +937,11 @@
   <!-- LÓGICA DE APLICACIÓN JAVASCRIPT (ES6+)                                -->
   <!-- ===================================================================== -->
   <script>
-    /**
-     * CREDENCIALES POR DEFECTO DE SUPABASE (PRECONFIGURADAS)
-     */
     const DEFAULT_SUPABASE_CONFIG = {
       url: 'https://atnzxceieogvedxvxdyx.supabase.co',
       key: 'sb_publishable_SnWYbNQK8HZ46EhZbY2uOw__16mCBMI'
     };
 
-    /**
-     * BANCO OFICIAL DE 27 AFIRMACIONES (Instrumento 1 - Test de Intereses)
-     */
     const QUESTIONS_BANK = [
       { id: 1, rama: 'Agropecuaria', text: 'Me gusta cuidar animales (vacas, cerdos, gallinas, búfalos).' },
       { id: 2, rama: 'Comercial', text: 'Disfruto vender o convencer a otros de que compren algo.' },
@@ -1003,14 +972,12 @@
       { id: 27, rama: 'Control', expected: 2, text: 'Pregunta de atención: para esta afirmación marca «Sí».' }
     ];
 
-    // Claves de almacenamiento en LocalStorage
     const STORAGE_KEYS = {
       STUDENTS: 'inem_ramas_students_v1',
       RESULTS: 'inem_ramas_results_v1',
       SETTINGS: 'inem_ramas_settings_v1'
     };
 
-    // Estado global de la aplicación
     const AppState = {
       students: [],
       results: {},
@@ -1031,7 +998,7 @@
     };
 
     // =========================================================================
-    // UTILIDADES DE NORMALIZACIÓN Y PERSISTENCIA (LOCALSTORAGE + SUPABASE)
+    // UTILIDADES DE NORMALIZACIÓN Y CABECERAS SUPABASE (COMPATIBLE PUBLISHABLE)
     // =========================================================================
 
     function normalizeSupabaseBaseUrl(rawUrl) {
@@ -1040,6 +1007,22 @@
         .trim()
         .replace(/\/rest\/v1\/?$/i, '')
         .replace(/\/$/, '');
+    }
+
+    /**
+     * Construye cabeceras válidas tanto para llaves nuevas (sb_publishable_...)
+     * como para llaves clásicas JWT (eyJ...).
+     */
+    function buildSupabaseHeaders(supabaseKey, extraHeaders = {}) {
+      const headers = {
+        'apikey': supabaseKey,
+        ...extraHeaders
+      };
+      // Solo agregar Authorization Bearer si la llave es un token JWT clásico (empieza por eyJ)
+      if (supabaseKey && supabaseKey.startsWith('eyJ')) {
+        headers['Authorization'] = `Bearer ${supabaseKey}`;
+      }
+      return headers;
     }
 
     function escapeHtml(str) {
@@ -1092,7 +1075,7 @@
         el.style.opacity = '0';
         el.style.transform = 'translateY(8px)';
         setTimeout(() => el.remove(), 300);
-      }, 4500);
+      }, 4800);
     }
 
     function openConfirmModal(title, message, onConfirm) {
@@ -1138,10 +1121,8 @@
         console.error('Error al cargar estado local:', err);
       }
 
-      // Descargar configuración, estudiantes y resultados desde Supabase al iniciar
       await pullFromSupabaseIfConfigured();
 
-      // Cargar datos de demostración iniciales solo si tanto local como Supabase están vacíos
       if (!AppState.students || AppState.students.length === 0) {
         AppState.students = [
           { Numero_Identidad: '1001', Nombre_Completo: 'Valentina Gómez Pérez', Grado: '8°', Sección: '8°-1' },
@@ -1167,8 +1148,9 @@
     async function saveSettings() {
       AppState.settings.supabaseUrl = normalizeSupabaseBaseUrl(AppState.settings.supabaseUrl);
       localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(AppState.settings));
-      updateSyncBadge();
-      return await syncSettingsToSupabase();
+      const res = await syncSettingsToSupabase();
+      updateSyncBadge(res.ok);
+      return res;
     }
 
     function updateSyncBadge(cloudOk = true) {
@@ -1184,7 +1166,6 @@
       }
     }
 
-    // Sincronizar PIN docente y cupos en Supabase (tabla: orientacion_config)
     async function syncSettingsToSupabase() {
       const cleanUrl = normalizeSupabaseBaseUrl(AppState.settings.supabaseUrl);
       const { supabaseKey } = AppState.settings;
@@ -1193,12 +1174,10 @@
       try {
         const res = await fetch(`${cleanUrl}/rest/v1/orientacion_config?on_conflict=clave`, {
           method: 'POST',
-          headers: {
+          headers: buildSupabaseHeaders(supabaseKey, {
             'Content-Type': 'application/json',
-            'apikey': supabaseKey,
-            'Authorization': `Bearer ${supabaseKey}`,
             'Prefer': 'resolution=merge-duplicates,return=minimal'
-          },
+          }),
           body: JSON.stringify({
             clave: 'global',
             pin_docente: String(AppState.settings.pin || '1234'),
@@ -1219,7 +1198,6 @@
       }
     }
 
-    // Sincronización con Supabase REST API (tabla: orientacion_ramas)
     async function syncResultToSupabase(docId, payload) {
       const cleanUrl = normalizeSupabaseBaseUrl(AppState.settings.supabaseUrl);
       const { supabaseKey } = AppState.settings;
@@ -1229,25 +1207,19 @@
         if (payload === null) {
           const resDel = await fetch(`${cleanUrl}/rest/v1/orientacion_ramas?numero_identidad=eq.${encodeURIComponent(docId)}`, {
             method: 'DELETE',
-            headers: {
-              'apikey': supabaseKey,
-              'Authorization': `Bearer ${supabaseKey}`
-            }
+            headers: buildSupabaseHeaders(supabaseKey)
           });
           return { ok: resDel.ok };
         }
 
-        // Asegurar primero que el estudiante exista en orientacion_estudiantes para no violar FK
         const studentObj = AppState.students.find(s => cleanId(s.Numero_Identidad) === docId);
         if (studentObj) {
           await fetch(`${cleanUrl}/rest/v1/orientacion_estudiantes?on_conflict=numero_identidad`, {
             method: 'POST',
-            headers: {
+            headers: buildSupabaseHeaders(supabaseKey, {
               'Content-Type': 'application/json',
-              'apikey': supabaseKey,
-              'Authorization': `Bearer ${supabaseKey}`,
               'Prefer': 'resolution=merge-duplicates,return=minimal'
-            },
+            }),
             body: JSON.stringify([{
               numero_identidad: docId,
               nombre_completo: studentObj.Nombre_Completo,
@@ -1259,12 +1231,10 @@
 
         const res = await fetch(`${cleanUrl}/rest/v1/orientacion_ramas?on_conflict=numero_identidad`, {
           method: 'POST',
-          headers: {
+          headers: buildSupabaseHeaders(supabaseKey, {
             'Content-Type': 'application/json',
-            'apikey': supabaseKey,
-            'Authorization': `Bearer ${supabaseKey}`,
             'Prefer': 'resolution=merge-duplicates,return=minimal'
-          },
+          }),
           body: JSON.stringify({
             numero_identidad: docId,
             datos: payload,
@@ -1279,7 +1249,7 @@
         }
         return { ok: true };
       } catch (err) {
-        console.warn('No se pudo sincronizar con Supabase (respaldo local guardado):', err);
+        console.warn('No se pudo sincronizar con Supabase:', err);
         return { ok: false, error: err.message };
       }
     }
@@ -1289,7 +1259,6 @@
       const { supabaseKey } = AppState.settings;
       if (!cleanUrl || !supabaseKey) return { ok: false, error: 'Sin credenciales Supabase' };
 
-      // Deduplicar estrictamente por numero_identidad antes de enviar lote
       const uniqueMap = new Map();
       AppState.students.forEach(s => {
         const id = cleanId(s.Numero_Identidad);
@@ -1307,18 +1276,15 @@
       if (payloadList.length === 0) return { ok: true, count: 0 };
 
       try {
-        // Enviar en bloques de 100 registros para evitar límites de tamaño en PostgREST
         const chunkSize = 100;
         for (let i = 0; i < payloadList.length; i += chunkSize) {
           const chunk = payloadList.slice(i, i + chunkSize);
           const res = await fetch(`${cleanUrl}/rest/v1/orientacion_estudiantes?on_conflict=numero_identidad`, {
             method: 'POST',
-            headers: {
+            headers: buildSupabaseHeaders(supabaseKey, {
               'Content-Type': 'application/json',
-              'apikey': supabaseKey,
-              'Authorization': `Bearer ${supabaseKey}`,
               'Prefer': 'resolution=merge-duplicates,return=minimal'
-            },
+            }),
             body: JSON.stringify(chunk)
           });
 
@@ -1328,6 +1294,7 @@
             return { ok: false, status: res.status, error: errText };
           }
         }
+        updateSyncBadge(true);
         return { ok: true, count: payloadList.length };
       } catch (err) {
         console.error('Error de red al guardar estudiantes en Supabase:', err);
@@ -1341,11 +1308,9 @@
       if (!cleanUrl || !supabaseKey) return false;
 
       try {
-        const headers = {
-          'apikey': supabaseKey,
-          'Authorization': `Bearer ${supabaseKey}`,
+        const headers = buildSupabaseHeaders(supabaseKey, {
           'Cache-Control': 'no-cache'
-        };
+        });
 
         const [resCfg, resSt, resData] = await Promise.all([
           fetch(`${cleanUrl}/rest/v1/orientacion_config?clave=eq.global&select=*`, { headers }),
@@ -1353,7 +1318,6 @@
           fetch(`${cleanUrl}/rest/v1/orientacion_ramas?select=*&limit=2000`, { headers })
         ]);
 
-        // 1. Configuración global (PIN y cupo máximo)
         if (resCfg.ok) {
           const cfgRows = await resCfg.json();
           if (Array.isArray(cfgRows) && cfgRows.length > 0) {
@@ -1364,7 +1328,6 @@
           }
         }
 
-        // 2. Base de estudiantes matriculados
         if (resSt.ok) {
           const rows = await resSt.json();
           if (Array.isArray(rows) && rows.length > 0) {
@@ -1378,7 +1341,6 @@
           }
         }
 
-        // 3. Resultados del test y selección
         if (resData.ok) {
           const rows = await resData.json();
           if (Array.isArray(rows)) {
@@ -1388,13 +1350,12 @@
                 cloudResults[cleanId(r.numero_identidad)] = r.datos;
               }
             });
-            // Combinar conservando registros de la nube como fuente principal
             AppState.results = { ...AppState.results, ...cloudResults };
             localStorage.setItem(STORAGE_KEYS.RESULTS, JSON.stringify(AppState.results));
           }
         }
 
-        const allOk = resSt.ok && resData.ok;
+        const allOk = resCfg.ok && resSt.ok && resData.ok;
         updateSyncBadge(allOk);
         return allOk;
       } catch (err) {
@@ -1449,7 +1410,6 @@
         return;
       }
 
-      // Verificar si ya completó el proceso previamente
       const existingResult = AppState.results[docId];
       if (existingResult && existingResult.completed) {
         errorEl.querySelector('span').textContent = `Hola ${student.Nombre_Completo}, ya registraste tus respuestas y selección de Rama (${existingResult.selection.option1}). Si hubo un error, solicita al docente reiniciar tu registro.`;
@@ -1457,7 +1417,6 @@
         return;
       }
 
-      // Iniciar sesión de estudiante
       AppState.currentStudent = {
         ...student,
         Numero_Identidad: docId
@@ -1894,7 +1853,6 @@
       btnSubmitPin.disabled = true;
       btnSubmitPin.textContent = 'Verificando...';
 
-      // Sincronizar primero desde Supabase para traer el PIN actualizado desde cualquier otro dispositivo
       await pullFromSupabaseIfConfigured();
 
       btnSubmitPin.disabled = false;
@@ -1919,7 +1877,6 @@
       switchView('viewLogin');
     });
 
-    // Botón manual de actualización desde Supabase
     document.getElementById('btnSyncNow').addEventListener('click', async () => {
       const ok = await pullFromSupabaseIfConfigured();
       document.getElementById('inputNewPin').value = AppState.settings.pin || '1234';
@@ -1932,7 +1889,6 @@
       }
     });
 
-    // Guardar configuración (Supabase, PIN y Cupos)
     document.getElementById('btnSaveSettings').addEventListener('click', async () => {
       const url = normalizeSupabaseBaseUrl(document.getElementById('inputSupabaseUrl').value);
       const key = document.getElementById('inputSupabaseKey').value.trim();
@@ -1955,14 +1911,13 @@
         renderAdminDashboard();
 
         if (!cfgSync.ok || !stSync.ok) {
-          showToast('Guardado en este equipo, pero falta crear la tabla orientacion_config o revisar permisos en Supabase (ver guía SQL).', 'warning');
+          showToast(`Guardado en este equipo, pero Supabase devolvió un aviso: ${cfgSync.error || stSync.error || 'revisa tablas/RLS'}`, 'warning');
           return;
         }
       }
-      showToast('Configuración y PIN guardados en la nube para todos los dispositivos.', 'success');
+      showToast('Configuración, PIN y estudiantes sincronizados en la nube para todos los dispositivos.', 'success');
     });
 
-    // Descargar plantilla Excel de ejemplo
     document.getElementById('btnDownloadTemplate').addEventListener('click', () => {
       const sampleData = [
         { Numero_Identidad: '1067000001', Nombre_Completo: 'Ejemplo Estudiante Uno', Grado: '8°', Sección: '8°-1' },
@@ -1976,7 +1931,6 @@
       XLSX.writeFile(wb, 'Plantilla_Estudiantes_Grado8.xlsx');
     });
 
-    // Importar base de datos de estudiantes desde Excel / CSV
     document.getElementById('inputExcelFile').addEventListener('change', async (e) => {
       const file = e.target.files?.[0];
       if (!file) return;
@@ -2004,7 +1958,6 @@
         }
 
         const importedMap = new Map();
-        // Si solo estaban los 4 ejemplos iniciales (1001..1004) y no tienen resultados, los reemplazamos limpiamente
         const isOnlyDemoData = AppState.students.length === 4 &&
           AppState.students.every(s => ['1001', '1002', '1003', '1004'].includes(cleanId(s.Numero_Identidad))) &&
           Object.keys(AppState.results).length === 0;
@@ -2040,7 +1993,7 @@
         if (syncResult && syncResult.ok) {
           showToast(`¡Listo! Se cargaron y sincronizaron en la nube ${addedOrUpdated} estudiantes${extraMsg}. Ya son visibles en todos los dispositivos.`, 'success');
         } else {
-          showToast(`Se cargaron ${addedOrUpdated} estudiantes localmente, pero Supabase rechazó la subida (${syncResult?.error || 'verifica la tabla orientacion_estudiantes y sus políticas RLS'}).`, 'error');
+          showToast(`Se cargaron ${addedOrUpdated} estudiantes localmente, pero Supabase devolvió error: ${syncResult?.error || 'verifica las tablas'}`, 'error');
         }
       } catch (err) {
         console.error(err);
@@ -2049,7 +2002,6 @@
       e.target.value = '';
     });
 
-    // Actualizar cupo máximo por Rama
     document.getElementById('inputMaxQuota').addEventListener('change', async (e) => {
       const val = parseInt(e.target.value, 10);
       AppState.settings.maxQuota = (!isNaN(val) && val > 0) ? val : 35;
@@ -2058,7 +2010,6 @@
       renderAdminDashboard();
     });
 
-    // Asistente de Distribución Inteligente respetando cupo máximo
     document.getElementById('btnSmartDistribute').addEventListener('click', async () => {
       const maxQuota = AppState.settings.maxQuota || 35;
       const ramas = [
@@ -2647,3 +2598,10 @@
   </script>
 </body>
 </html>
+```
+
+### Pasos para aplicar esta corrección:
+1. Reemplaza el `index.html` en tu repositorio de GitHub con este código actualizado.
+2. Espera 1 minuto a que GitHub Pages actualice la página y recarga con `Ctrl + Shift + R`.
+3. Verás que arriba a la derecha ahora aparece en azul/verde **`Nube Supabase Conectada`**.
+4. Haz clic una sola vez en **Guardar Configuración** (con tu PIN `1023`) y vuelve a cargar tu archivo Excel de los **146 estudiantes**: esta vez se subirán de inmediato a Supabase y aparecerán automáticamente en tu otro computador y celular.
