@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Orientación Vocacional y Selección de Rama Técnica | Grado 8°</title>
+  <title>Selección de Ramas 8° | Exploración Vocacional y Selección de Rama</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts: Inter -->
@@ -30,22 +30,27 @@
   <style>
     body {
       font-family: 'Inter', sans-serif;
-      background-color: #0b1120;
-      color: #f1f5f9;
+      overflow-x: hidden;
+    }
+    /* Evita zoom automático en iOS/Android al enfocar campos en móvil */
+    @media screen and (max-width: 640px) {
+      input, select, textarea {
+        font-size: 16px !important;
+      }
     }
     ::-webkit-scrollbar {
       width: 8px;
       height: 8px;
     }
     ::-webkit-scrollbar-track {
-      background: #0f172a;
+      background: #060b16;
     }
     ::-webkit-scrollbar-thumb {
-      background: #334155;
+      background: #1e293b;
       border-radius: 4px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: #475569;
+      background: #334155;
     }
     @media print {
       body * {
@@ -78,78 +83,139 @@
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 selection:bg-emerald-500/30 selection:text-emerald-200">
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-900 dark:bg-[#060b16] dark:text-slate-100 transition-colors duration-200 selection:bg-blue-500/30 selection:text-blue-200">
 
-  <!-- Barra superior institucional -->
-  <header class="sticky top-0 z-30 border-b border-slate-800/80 bg-slate-900/90 backdrop-blur-md">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-lg shadow-emerald-950/50">
-          <i data-lucide="compass" class="w-6 h-6 text-white"></i>
-        </div>
-        <div>
-          <h1 class="text-sm sm:text-base font-bold tracking-tight text-white leading-tight">
-            Exploración Vocacional y Ramas Técnicas
-          </h1>
-          <p class="text-xs text-slate-400">Grado 8° • Proceso de Selección para Media Técnica (9° - 11°)</p>
-        </div>
-      </div>
+  <!-- ===================================================================== -->
+  <!-- BARRA DE NAVEGACIÓN SUPERIOR                                          -->
+  <!-- ===================================================================== -->
+  <header class="sticky top-0 z-30 border-b border-slate-200 dark:border-slate-800/80 bg-white/90 dark:bg-[#080e1c]/90 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-2 sm:gap-4">
+      <!-- Marca -->
+      <button type="button" onclick="navigateTopTab('viewLogin')" class="flex items-center gap-2 sm:gap-2.5 text-left cursor-pointer group min-w-0">
+        <img
+          src="https://i.imgur.com/irkY5hA.png"
+          onerror="this.onerror=null;this.src='https://i.imgur.com/irkY5hA.jpg';"
+          alt="Logo Selección de Ramas"
+          class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl object-contain bg-white/95 p-0.5 shadow-md shadow-blue-950/30 border border-slate-200 dark:border-slate-700/80 shrink-0"
+        />
+        <span class="text-sm sm:text-lg font-extrabold tracking-tight text-slate-900 dark:text-white truncate">
+          Selección de Ramas 8°
+        </span>
+      </button>
 
-      <div class="flex items-center gap-2 sm:gap-3">
-        <span id="syncStatusBadge" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
+      <!-- Navegación central -->
+      <nav class="hidden md:flex items-center gap-7 text-sm font-medium">
+        <button
+          type="button"
+          id="navTabLogin"
+          onclick="navigateTopTab('viewLogin')"
+          class="py-5 border-b-2 border-blue-500 text-slate-900 dark:text-white font-semibold transition cursor-pointer"
+        >
+          Ingreso Estudiantil
+        </button>
+        <button
+          type="button"
+          id="navTabRamas"
+          onclick="navigateTopTab('viewRamasInfo')"
+          class="py-5 border-b-2 border-transparent text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition cursor-pointer"
+        >
+          Ramas Técnicas
+        </button>
+        <button
+          type="button"
+          id="navTabAdmin"
+          onclick="openAdminModalOrView()"
+          class="py-5 border-b-2 border-transparent text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition cursor-pointer"
+        >
+          Panel Docente
+        </button>
+      </nav>
+
+      <!-- Acciones derecha -->
+      <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+        <span id="syncStatusBadge" class="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-100 dark:bg-slate-800/90 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700/80">
           <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
-          Nube Supabase Conectada
+          Supabase Conectado
         </span>
 
+        <!-- Toggle Tema Claro / Oscuro -->
         <button
-          id="btnOpenAdmin"
           type="button"
-          class="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition cursor-pointer"
+          id="btnToggleTheme"
+          class="p-2 sm:p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#11192c] dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/80 transition cursor-pointer"
+          title="Cambiar tema claro / oscuro"
         >
-          <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
-          <span>Panel Docente</span>
+          <i id="themeIcon" data-lucide="sun" class="w-4 h-4"></i>
+        </button>
+
+        <!-- Botón Ingresar con ID -->
+        <button
+          type="button"
+          id="btnHeaderLogin"
+          onclick="focusStudentIdInput()"
+          class="px-3 sm:px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-semibold shadow-md shadow-blue-950/40 transition cursor-pointer whitespace-nowrap"
+        >
+          <span class="sm:hidden">Ingresar</span>
+          <span class="hidden sm:inline">Ingresar con ID</span>
         </button>
       </div>
+    </div>
+
+    <!-- Navegación móvil -->
+    <div class="flex md:hidden border-t border-slate-200 dark:border-slate-800/80 bg-white dark:bg-[#080e1c] px-2 justify-around text-xs font-semibold">
+      <button type="button" id="mobTabLogin" onclick="navigateTopTab('viewLogin')" class="flex-1 py-2.5 border-b-2 border-blue-500 text-blue-600 dark:text-white text-center">
+        Ingreso
+      </button>
+      <button type="button" id="mobTabRamas" onclick="navigateTopTab('viewRamasInfo')" class="flex-1 py-2.5 border-b-2 border-transparent text-slate-500 dark:text-slate-400 text-center">
+        Ramas Técnicas
+      </button>
+      <button type="button" id="mobTabAdmin" onclick="openAdminModalOrView()" class="flex-1 py-2.5 border-b-2 border-transparent text-slate-500 dark:text-slate-400 text-center">
+        Panel Docente
+      </button>
     </div>
   </header>
 
   <!-- Contenedor principal -->
-  <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-10">
-
-    <!-- Alerta / Notificación flotante -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-3.5 sm:px-6 py-5 sm:py-10">
+    <!-- Notificación flotante -->
     <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-md w-full pointer-events-none px-4 sm:px-0"></div>
 
     <!-- ===================================================================== -->
-    <!-- VISTA 1: INGRESO DEL ESTUDIANTE POR NÚMERO DE IDENTIDAD               -->
+    <!-- VISTA 1: INGRESO ESTUDIANTIL + PREVIEW DE RAMAS (DISEÑO DOS COLUMNAS) -->
     <!-- ===================================================================== -->
-    <section id="viewLogin" class="max-w-lg mx-auto mt-4 sm:mt-10">
-      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl">
-        <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mb-5">
-          <i data-lucide="user-check" class="w-6 h-6 text-emerald-400"></i>
-        </div>
-
-        <h2 class="text-xl sm:text-2xl font-bold text-white mb-2">Ingreso de Estudiante</h2>
-        <p class="text-sm text-slate-400 mb-6 leading-relaxed">
-          Digita tu <strong class="text-slate-200">Número de Identidad</strong> (Tarjeta de Identidad o Cédula) sin puntos ni espacios para verificar tu matrícula en Grado 8° e iniciar el proceso.
+    <section id="viewLogin" class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start pt-2">
+      <!-- Columna Izquierda: Formulario de Ingreso -->
+      <div class="lg:col-span-6 bg-white dark:bg-[#0b1222] border border-slate-200 dark:border-slate-800/90 rounded-3xl p-6 sm:p-9 shadow-xl dark:shadow-2xl">
+        <p class="text-xs sm:text-sm font-semibold text-blue-600 dark:text-blue-400 mb-2">
+          Selección de Ramas • Grado 8°
+        </p>
+        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.15] mb-4">
+          Elige tu Rama Técnica para el próximo año
+        </h1>
+        <p class="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed mb-7">
+          Ingresa con tu número de documento de identidad para verificar tu nombre y sección (<strong class="text-slate-800 dark:text-slate-200">8°-1 a 8°-4</strong>), completar el test vocacional obligatorio y realizar tu selección directa.
         </p>
 
         <form id="formLogin" class="space-y-4">
           <div>
-            <label for="inputDocumento" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
-              Número de Identidad
+            <label for="inputDocumento" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">
+              Número de documento de identidad
             </label>
             <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <i data-lucide="key-round" class="w-4 h-4"></i>
+              </div>
               <input
                 type="text"
                 id="inputDocumento"
                 inputmode="numeric"
                 autocomplete="off"
-                placeholder="Ej: 1067894512"
-                class="w-full px-4 py-3.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder-slate-500 text-base font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
+                placeholder="Digita tu número sin puntos ni espacios"
+                class="w-full pl-10 pr-4 py-3.5 rounded-xl bg-slate-50 dark:bg-[#070c17] border border-slate-300 dark:border-slate-700/90 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm sm:text-base font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                 required
               />
             </div>
-            <p id="loginErrorMsg" class="hidden mt-2 text-xs text-rose-400 flex items-center gap-1.5">
+            <p id="loginErrorMsg" class="hidden mt-2 text-xs text-rose-500 dark:text-rose-400 flex items-center gap-1.5">
               <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
               <span></span>
             </p>
@@ -158,38 +224,96 @@
           <button
             type="submit"
             id="btnSubmitLogin"
-            class="w-full py-3.5 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-semibold text-sm sm:text-base shadow-lg shadow-emerald-950/60 transition flex items-center justify-center gap-2 cursor-pointer"
+            class="w-full py-3.5 px-5 rounded-xl bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-semibold text-sm sm:text-base shadow-lg shadow-blue-950/50 transition flex items-center justify-center gap-2 cursor-pointer"
           >
-            <span>Verificar Identidad y Continuar</span>
+            <span>Verificar identidad e ingresar</span>
             <i data-lucide="arrow-right" class="w-4 h-4"></i>
           </button>
         </form>
 
-        <div class="mt-6 pt-5 border-t border-slate-800/80 flex items-start gap-3 text-xs text-slate-400">
-          <i data-lucide="info" class="w-4 h-4 text-sky-400 shrink-0 mt-0.5"></i>
-          <p>
-            El proceso consta de dos etapas obligatorias: <strong class="text-slate-300">1) Test de intereses (27 afirmaciones + reflexión)</strong> y <strong class="text-slate-300">2) Selección directa de tus 3 opciones de Rama Técnica</strong>.
-          </p>
+        <!-- Pasos del proceso en la parte inferior -->
+        <div class="grid grid-cols-3 gap-3 mt-8 pt-6 border-t border-slate-200 dark:border-slate-800/80">
+          <div>
+            <p class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">01. Identidad</p>
+            <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5">Nombre y sección 8°</p>
+          </div>
+          <div>
+            <p class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">02. Test (27)</p>
+            <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5">Obligatorio para avanzar</p>
+          </div>
+          <div>
+            <p class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">03. Selección</p>
+            <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5">1.ª, 2.ª y 3.ª opción directa</p>
+          </div>
         </div>
       </div>
+
+      <!-- Columna Derecha: Ramas Técnicas Disponibles con Fotos -->
+      <div class="lg:col-span-6 space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+            Ramas técnicas disponibles
+          </h2>
+          <button
+            type="button"
+            onclick="navigateTopTab('viewRamasInfo')"
+            class="text-xs sm:text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
+          >
+            <span>Ver detalle y videos</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+
+        <div id="landingRamasList" class="space-y-3"></div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- VISTA 1B: CATÁLOGO DETALLADO DE RAMAS TÉCNICAS + VIDEOS YOUTUBE       -->
+    <!-- ===================================================================== -->
+    <section id="viewRamasInfo" class="hidden space-y-6">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <p class="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-1.5">
+            Oferta Técnica • Selección de Ramas • Grado 8°
+          </p>
+          <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
+            Conoce las cinco opciones de Rama Técnica antes de elegir
+          </h2>
+          <p class="text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-2 max-w-3xl">
+            La especialidad Industrial se divide en <strong class="text-slate-800 dark:text-slate-200">Metalmecánica</strong> y <strong class="text-slate-800 dark:text-slate-200">Electricidad</strong>. Mira los videos de presentación, revisa los cupos por taller y explora lo que aprenderás en cada área formativa.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onclick="navigateTopTab('viewLogin')"
+          class="self-start md:self-end px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-semibold shadow-md transition inline-flex items-center gap-2 shrink-0 cursor-pointer"
+        >
+          <span>Ir a Ingresar con mi ID</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div id="ramasShowcaseGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </section>
 
     <!-- ===================================================================== -->
     <!-- VISTA 2: TEST DE INTERESES (27 AFIRMACIONES + PREGUNTA FINAL)         -->
     <!-- ===================================================================== -->
-    <section id="viewTest" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <section id="viewTest" class="hidden max-w-5xl mx-auto space-y-6">
+      <div class="bg-white dark:bg-[#0b1222] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
         <div class="flex items-center gap-3.5">
-          <div class="w-11 h-11 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold text-base shrink-0" id="studentAvatar">
+          <div class="w-11 h-11 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold text-base shrink-0" id="studentAvatar">
             8°
           </div>
           <div>
-            <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Estudiante Verificado</p>
-            <h2 id="studentNameDisplay" class="text-base sm:text-lg font-bold text-white leading-snug">---</h2>
-            <div class="flex flex-wrap items-center gap-2 mt-1 text-xs text-slate-300">
-              <span class="px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700">ID: <strong id="studentIdDisplay">---</strong></span>
-              <span class="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">Grado: <strong id="studentGradeDisplay">---</strong></span>
-              <span class="px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-300 border border-sky-500/30">Sección: <strong id="studentSectionDisplay">---</strong></span>
+            <p class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">Estudiante Verificado</p>
+            <h2 id="studentNameDisplay" class="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-snug">---</h2>
+            <div class="flex flex-wrap items-center gap-2 mt-1 text-xs text-slate-600 dark:text-slate-300">
+              <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">ID: <strong id="studentIdDisplay">---</strong></span>
+              <span class="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">Grado: <strong id="studentGradeDisplay">---</strong></span>
+              <span class="px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/30">Sección: <strong id="studentSectionDisplay">---</strong></span>
             </div>
           </div>
         </div>
@@ -197,52 +321,52 @@
         <button
           type="button"
           id="btnLogoutStudent"
-          class="self-start sm:self-center px-3 py-2 rounded-xl text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition inline-flex items-center gap-1.5 cursor-pointer"
+          class="self-start sm:self-center px-3 py-2 rounded-xl text-xs font-medium bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition inline-flex items-center gap-1.5 cursor-pointer"
         >
           <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
           <span>Salir</span>
         </button>
       </div>
 
-      <div id="attentionRestartBanner" class="hidden bg-amber-950/60 border border-amber-500/50 rounded-2xl p-4 sm:p-5 flex items-start gap-3.5">
-        <i data-lucide="alert-triangle" class="w-6 h-6 text-amber-400 shrink-0 mt-0.5"></i>
-        <div class="text-sm text-amber-100">
-          <p class="font-bold text-amber-300 mb-1">Test reiniciado por control de lectura</p>
-          <p class="text-amber-200/90 leading-relaxed">
+      <div id="attentionRestartBanner" class="hidden bg-amber-50 dark:bg-amber-950/60 border border-amber-400 dark:border-amber-500/50 rounded-2xl p-4 sm:p-5 flex items-start gap-3.5">
+        <i data-lucide="alert-triangle" class="w-6 h-6 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5"></i>
+        <div class="text-sm text-amber-900 dark:text-amber-100">
+          <p class="font-bold text-amber-700 dark:text-amber-300 mb-1">Test reiniciado por control de lectura</p>
+          <p class="leading-relaxed">
             Se detectó que respondiste sin leer con atención las preguntas de control. El orden de las afirmaciones se ha reorganizado. Por favor, lee cada enunciado completo antes de marcar tu respuesta.
           </p>
         </div>
       </div>
 
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6">
+      <div class="bg-white dark:bg-[#0b1222] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
           <div>
-            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 mb-1.5">
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/15 text-blue-600 dark:text-blue-300 border border-blue-500/30 mb-1.5">
               Etapa 1 de 2 • Obligatoria
             </span>
-            <h3 class="text-lg sm:text-xl font-bold text-white">Instrumento 1: Test de Intereses</h3>
+            <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">Instrumento 1: Test de Intereses</h3>
           </div>
           <div class="text-left sm:text-right">
-            <span id="testProgressText" class="text-sm font-bold text-emerald-400">0 / 27 respondidas</span>
-            <div class="w-full sm:w-48 h-2 bg-slate-800 rounded-full overflow-hidden mt-1.5">
-              <div id="testProgressBar" class="h-full bg-emerald-500 transition-all duration-300" style="width: 0%"></div>
+            <span id="testProgressText" class="text-sm font-bold text-blue-600 dark:text-blue-400">0 / 27 respondidas</span>
+            <div class="w-full sm:w-48 h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden mt-1.5">
+              <div id="testProgressBar" class="h-full bg-blue-600 transition-all duration-300" style="width: 0%"></div>
             </div>
           </div>
         </div>
-        <p class="text-sm text-slate-400 mb-4">
-          Lee cada afirmación completa y marca una sola opción (<strong class="text-slate-200">Sí</strong>, <strong class="text-slate-200">Más o menos</strong> o <strong class="text-slate-200">No</strong>). El test está dividido en <strong class="text-slate-200">3 bloques de 9 preguntas</strong>. Algunas preguntas piden una respuesta específica; léelas con atención.
+        <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
+          Lee cada afirmación completa y marca una sola opción (<strong class="text-slate-900 dark:text-slate-200">Sí</strong>, <strong class="text-slate-900 dark:text-slate-200">Más o menos</strong> o <strong class="text-slate-900 dark:text-slate-200">No</strong>). El test está dividido en <strong class="text-slate-900 dark:text-slate-200">3 bloques de 9 preguntas</strong>. Algunas preguntas piden una respuesta específica; léelas con atención.
         </p>
 
-        <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800/80" role="tablist">
-          <button type="button" id="tabBtn0" onclick="goToTestTab(0)" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold border transition flex items-center justify-center gap-2 cursor-pointer bg-emerald-600/20 border-emerald-500 text-emerald-300">
+        <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-200 dark:border-slate-800/80" role="tablist">
+          <button type="button" id="tabBtn0" onclick="goToTestTab(0)" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold border transition flex items-center justify-center gap-2 cursor-pointer bg-blue-600/15 border-blue-500 text-blue-600 dark:text-blue-300">
             <span>Bloque 1</span>
             <span class="hidden sm:inline text-[11px] font-normal opacity-80">(1 - 9)</span>
           </button>
-          <button type="button" id="tabBtn1" onclick="goToTestTab(1)" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold border transition flex items-center justify-center gap-2 cursor-pointer bg-slate-950 border-slate-800 text-slate-400">
+          <button type="button" id="tabBtn1" onclick="goToTestTab(1)" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold border transition flex items-center justify-center gap-2 cursor-pointer bg-slate-100 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400">
             <span>Bloque 2</span>
             <span class="hidden sm:inline text-[11px] font-normal opacity-80">(10 - 18)</span>
           </button>
-          <button type="button" id="tabBtn2" onclick="goToTestTab(2)" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold border transition flex items-center justify-center gap-2 cursor-pointer bg-slate-950 border-slate-800 text-slate-400">
+          <button type="button" id="tabBtn2" onclick="goToTestTab(2)" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold border transition flex items-center justify-center gap-2 cursor-pointer bg-slate-100 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400">
             <span>Bloque 3</span>
             <span class="hidden sm:inline text-[11px] font-normal opacity-80">(19 - 27)</span>
           </button>
@@ -252,27 +376,27 @@
       <form id="formTest" class="space-y-4" novalidate>
         <div id="questionsContainer" class="space-y-3.5"></div>
 
-        <div id="finalReflectionBox" class="hidden bg-slate-900 border border-slate-700/80 rounded-2xl p-5 sm:p-6 mt-6 shadow-lg">
-          <label for="inputFinalReflection" class="block text-sm sm:text-base font-bold text-white mb-1.5">
-            Pregunta final (obligatoria) <span class="text-rose-400">*</span>
+        <div id="finalReflectionBox" class="hidden bg-white dark:bg-[#0b1222] border border-slate-200 dark:border-slate-700/80 rounded-2xl p-5 sm:p-6 mt-6 shadow-lg">
+          <label for="inputFinalReflection" class="block text-sm sm:text-base font-bold text-slate-900 dark:text-white mb-1.5">
+            Pregunta final (obligatoria) <span class="text-rose-500">*</span>
           </label>
-          <p class="text-xs sm:text-sm text-slate-400 mb-3">
+          <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mb-3">
             Escribe en una línea la afirmación con la que más te identificaste y explica brevemente por qué.
           </p>
           <textarea
             id="inputFinalReflection"
             rows="2"
             placeholder="Ej: Me identifiqué con la afirmación sobre energía solar porque me gustaría aprender a instalar paneles en mi comunidad..."
-            class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
+            class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
           ></textarea>
-          <p id="reflectionError" class="hidden mt-2 text-xs text-rose-400"></p>
+          <p id="reflectionError" class="hidden mt-2 text-xs text-rose-500 dark:text-rose-400"></p>
         </div>
 
         <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3">
           <button
             type="button"
             id="btnPrevBlock"
-            class="hidden w-full sm:w-auto px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs sm:text-sm border border-slate-700 transition inline-flex items-center justify-center gap-2 cursor-pointer"
+            class="hidden w-full sm:w-auto px-5 py-3 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-xs sm:text-sm border border-slate-300 dark:border-slate-700 transition inline-flex items-center justify-center gap-2 cursor-pointer"
           >
             <i data-lucide="chevron-left" class="w-4 h-4"></i>
             <span>Bloque Anterior</span>
@@ -283,7 +407,7 @@
           <button
             type="button"
             id="btnNextBlock"
-            class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-semibold text-sm shadow-lg shadow-sky-950/60 transition inline-flex items-center justify-center gap-2 cursor-pointer"
+            class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-lg shadow-blue-950/50 transition inline-flex items-center justify-center gap-2 cursor-pointer"
           >
             <span>Siguiente Bloque (9 preguntas)</span>
             <i data-lucide="chevron-right" class="w-4 h-4"></i>
@@ -292,7 +416,7 @@
           <button
             type="submit"
             id="btnSubmitTest"
-            class="hidden w-full sm:w-auto px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm sm:text-base shadow-lg shadow-emerald-950/60 transition inline-flex items-center justify-center gap-2 cursor-pointer"
+            class="hidden w-full sm:w-auto px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm sm:text-base shadow-lg shadow-emerald-950/50 transition inline-flex items-center justify-center gap-2 cursor-pointer"
           >
             <span>Guardar Test y Pasar a Selección de Rama</span>
             <i data-lucide="check-circle" class="w-5 h-5"></i>
@@ -304,80 +428,29 @@
     <!-- ===================================================================== -->
     <!-- VISTA 3: SELECCIÓN DIRECTA DE RAMA TÉCNICA (3 OPCIONES PRIORIZADAS)   -->
     <!-- ===================================================================== -->
-    <section id="viewSelection" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6">
-        <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-500/15 text-sky-300 border border-sky-500/30 mb-2">
+    <section id="viewSelection" class="hidden max-w-5xl mx-auto space-y-6">
+      <div class="bg-white dark:bg-[#0b1222] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm">
+        <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/15 text-blue-600 dark:text-blue-300 border border-blue-500/30 mb-2">
           Etapa 2 de 2 • Selección Directa
         </span>
-        <h2 class="text-xl sm:text-2xl font-bold text-white mb-2">Selecciona tus 3 Opciones de Rama Técnica</h2>
-        <p class="text-sm text-slate-400 leading-relaxed">
-          Revisa la descripción de cada Rama Técnica que cursarás en <strong class="text-slate-200">9°, 10° y 11°</strong>. Elige tu <strong class="text-emerald-400">1.ª Opción (Principal)</strong>, <strong class="text-sky-400">2.ª Opción</strong> y <strong class="text-amber-400">3.ª Opción</strong> en orden de preferencia personal. No puedes repetir la misma especialidad.
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2">Selecciona tus 3 Opciones de Rama Técnica</h2>
+        <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+          Revisa la descripción de cada Rama Técnica que cursarás en <strong class="text-slate-900 dark:text-slate-200">9°, 10° y 11°</strong>. Elige tu <strong class="text-emerald-600 dark:text-emerald-400">1.ª Opción (Principal)</strong>, <strong class="text-blue-600 dark:text-blue-400">2.ª Opción</strong> y <strong class="text-amber-600 dark:text-amber-400">3.ª Opción</strong> en orden de preferencia personal. No puedes repetir la misma especialidad.
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 hover:border-emerald-500/40 transition">
-          <div class="flex items-center gap-3 mb-2.5">
-            <div class="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center">
-              <i data-lucide="sprout" class="w-5 h-5"></i>
-            </div>
-            <h3 class="text-base font-bold text-white">Agropecuaria</h3>
-          </div>
-          <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
-            Producción agrícola y pecuaria, manejo de cultivos, cuidado de especies animales, piscicultura, conservación de suelos, aguas y técnicas modernas de finca.
-          </p>
-        </div>
+      <div id="selectionRamasCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 
-        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 hover:border-sky-500/40 transition">
-          <div class="flex items-center gap-3 mb-2.5">
-            <div class="w-10 h-10 rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center">
-              <i data-lucide="briefcase" class="w-5 h-5"></i>
-            </div>
-            <h3 class="text-base font-bold text-white">Comercial</h3>
-          </div>
-          <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
-            Gestión empresarial, contabilidad, finanzas, ahorro e inversión, emprendimiento, atención al cliente, costos, ventas y administración de negocios.
-          </p>
-        </div>
-
-        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 hover:border-amber-500/40 transition">
-          <div class="flex items-center gap-3 mb-2.5">
-            <div class="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center">
-              <i data-lucide="wrench" class="w-5 h-5"></i>
-            </div>
-            <div>
-              <h3 class="text-base font-bold text-white">Industrial</h3>
-              <span class="text-[11px] font-medium text-amber-300">Subramas: Metalmecánica • Electricidad</span>
-            </div>
-          </div>
-          <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
-            <strong class="text-slate-200">Metalmecánica:</strong> mecanizado, torno, soldadura, herramientas y precisión. <strong class="text-slate-200">Electricidad:</strong> circuitos, instalaciones residenciales y taller fotovoltaico (paneles solares).
-          </p>
-        </div>
-
-        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 hover:border-rose-500/40 transition">
-          <div class="flex items-center gap-3 mb-2.5">
-            <div class="w-10 h-10 rounded-xl bg-rose-500/15 text-rose-400 flex items-center justify-center">
-              <i data-lucide="heart-pulse" class="w-5 h-5"></i>
-            </div>
-            <h3 class="text-base font-bold text-white">Promoción Social</h3>
-          </div>
-          <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
-            Salud comunitaria, epidemiología, primeros auxilios, salud y medio ambiente, microbiología básica y educación en salud sexual y reproductiva.
-          </p>
-        </div>
-      </div>
-
-      <form id="formSelection" class="bg-slate-900 border border-slate-700 rounded-2xl p-5 sm:p-7 space-y-5 shadow-xl">
+      <form id="formSelection" class="bg-white dark:bg-[#0b1222] border border-slate-200 dark:border-slate-700 rounded-2xl p-5 sm:p-7 space-y-5 shadow-xl">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="p-4 rounded-xl bg-slate-950 border border-emerald-500/40">
-            <label for="selectOpt1" class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-400 mb-2">
-              <span class="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center text-xs font-extrabold">1</span>
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-emerald-500/40">
+            <label for="selectOpt1" class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-2">
+              <span class="w-5 h-5 rounded-full bg-emerald-500 text-white dark:text-slate-950 flex items-center justify-center text-xs font-extrabold">1</span>
               Primera Opción (Preferida)
             </label>
             <select
               id="selectOpt1"
-              class="w-full px-3.5 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              class="w-full px-3.5 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500"
               required
             >
               <option value="">-- Selecciona 1.ª opción --</option>
@@ -389,14 +462,14 @@
             </select>
           </div>
 
-          <div class="p-4 rounded-xl bg-slate-950 border border-sky-500/40">
-            <label for="selectOpt2" class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-sky-400 mb-2">
-              <span class="w-5 h-5 rounded-full bg-sky-500 text-slate-950 flex items-center justify-center text-xs font-extrabold">2</span>
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-blue-500/40">
+            <label for="selectOpt2" class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-2">
+              <span class="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-extrabold">2</span>
               Segunda Opción
             </label>
             <select
               id="selectOpt2"
-              class="w-full px-3.5 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sky-500"
+              class="w-full px-3.5 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             >
               <option value="">-- Selecciona 2.ª opción --</option>
@@ -408,14 +481,14 @@
             </select>
           </div>
 
-          <div class="p-4 rounded-xl bg-slate-950 border border-amber-500/40">
-            <label for="selectOpt3" class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">
-              <span class="w-5 h-5 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center text-xs font-extrabold">3</span>
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-amber-500/40">
+            <label for="selectOpt3" class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-2">
+              <span class="w-5 h-5 rounded-full bg-amber-500 text-white dark:text-slate-950 flex items-center justify-center text-xs font-extrabold">3</span>
               Tercera Opción
             </label>
             <select
               id="selectOpt3"
-              class="w-full px-3.5 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-500"
+              class="w-full px-3.5 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-amber-500"
               required
             >
               <option value="">-- Selecciona 3.ª opción --</option>
@@ -428,18 +501,18 @@
           </div>
         </div>
 
-        <p id="selectionErrorMsg" class="hidden text-xs text-rose-400 flex items-center gap-1.5">
+        <p id="selectionErrorMsg" class="hidden text-xs text-rose-500 dark:text-rose-400 flex items-center gap-1.5">
           <i data-lucide="alert-circle" class="w-4 h-4"></i>
           <span></span>
         </p>
 
-        <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-800">
-          <p class="text-xs text-slate-400">
+        <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200 dark:border-slate-800">
+          <p class="text-xs text-slate-500 dark:text-slate-400">
             Verifica tus tres elecciones antes de enviar. Una vez enviadas quedarán registradas en el sistema institucional.
           </p>
           <button
             type="submit"
-            class="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm sm:text-base shadow-lg shadow-emerald-950/60 transition inline-flex items-center justify-center gap-2 cursor-pointer"
+            class="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm sm:text-base shadow-lg shadow-emerald-950/50 transition inline-flex items-center justify-center gap-2 cursor-pointer"
           >
             <i data-lucide="send" class="w-4 h-4"></i>
             <span>Enviar Selección Definitiva</span>
@@ -452,42 +525,42 @@
     <!-- VISTA 4: COMPROBANTE DE FINALIZACIÓN (SIN MOSTRAR RESULTADOS DEL TEST) -->
     <!-- ===================================================================== -->
     <section id="viewSuccess" class="hidden max-w-xl mx-auto mt-6">
-      <div class="bg-slate-900 border border-emerald-500/40 rounded-2xl p-6 sm:p-8 text-center shadow-2xl">
+      <div class="bg-white dark:bg-[#0b1222] border border-emerald-500/40 rounded-2xl p-6 sm:p-8 text-center shadow-2xl">
         <div class="w-16 h-16 rounded-full bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center mx-auto mb-5">
-          <i data-lucide="check-circle-2" class="w-9 h-9 text-emerald-400"></i>
+          <i data-lucide="check-circle-2" class="w-9 h-9 text-emerald-500 dark:text-emerald-400"></i>
         </div>
-        <h2 class="text-2xl font-bold text-white mb-2">¡Registro Completado con Éxito!</h2>
-        <p class="text-sm text-slate-400 mb-6">
+        <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">¡Registro Completado con Éxito!</h2>
+        <p class="text-sm text-slate-600 dark:text-slate-400 mb-6">
           Tus respuestas del test y tu selección directa de Rama Técnica han sido almacenadas correctamente para el proceso de orientación vocacional.
         </p>
 
-        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 sm:p-5 text-left space-y-2.5 text-sm mb-6">
-          <div class="flex justify-between border-b border-slate-800/80 pb-2">
-            <span class="text-slate-400">Estudiante:</span>
-            <span id="receiptName" class="font-semibold text-white text-right">---</span>
+        <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-4 sm:p-5 text-left space-y-2.5 text-sm mb-6">
+          <div class="flex justify-between border-b border-slate-200 dark:border-slate-800/80 pb-2">
+            <span class="text-slate-500 dark:text-slate-400">Estudiante:</span>
+            <span id="receiptName" class="font-semibold text-slate-900 dark:text-white text-right">---</span>
           </div>
-          <div class="flex justify-between border-b border-slate-800/80 pb-2">
-            <span class="text-slate-400">Identificación / Curso:</span>
-            <span id="receiptMeta" class="font-medium text-slate-200 text-right">---</span>
+          <div class="flex justify-between border-b border-slate-200 dark:border-slate-800/80 pb-2">
+            <span class="text-slate-500 dark:text-slate-400">Identificación / Curso:</span>
+            <span id="receiptMeta" class="font-medium text-slate-700 dark:text-slate-200 text-right">---</span>
           </div>
-          <div class="flex justify-between border-b border-slate-800/80 pb-2">
-            <span class="text-slate-400">1.ª Opción Seleccionada:</span>
-            <span id="receiptOpt1" class="font-bold text-emerald-400 text-right">---</span>
+          <div class="flex justify-between border-b border-slate-200 dark:border-slate-800/80 pb-2">
+            <span class="text-slate-500 dark:text-slate-400">1.ª Opción Seleccionada:</span>
+            <span id="receiptOpt1" class="font-bold text-emerald-600 dark:text-emerald-400 text-right">---</span>
           </div>
-          <div class="flex justify-between border-b border-slate-800/80 pb-2">
-            <span class="text-slate-400">2.ª Opción Seleccionada:</span>
-            <span id="receiptOpt2" class="font-medium text-sky-300 text-right">---</span>
+          <div class="flex justify-between border-b border-slate-200 dark:border-slate-800/80 pb-2">
+            <span class="text-slate-500 dark:text-slate-400">2.ª Opción Seleccionada:</span>
+            <span id="receiptOpt2" class="font-medium text-blue-600 dark:text-blue-300 text-right">---</span>
           </div>
           <div class="flex justify-between">
-            <span class="text-slate-400">3.ª Opción Seleccionada:</span>
-            <span id="receiptOpt3" class="font-medium text-amber-300 text-right">---</span>
+            <span class="text-slate-500 dark:text-slate-400">3.ª Opción Seleccionada:</span>
+            <span id="receiptOpt3" class="font-medium text-amber-600 dark:text-amber-300 text-right">---</span>
           </div>
         </div>
 
         <button
           type="button"
           id="btnFinishAndReset"
-          class="w-full py-3.5 px-5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-sm border border-slate-700 transition inline-flex items-center justify-center gap-2 cursor-pointer"
+          class="w-full py-3.5 px-5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm transition inline-flex items-center justify-center gap-2 cursor-pointer"
         >
           <i data-lucide="home" class="w-4 h-4"></i>
           <span>Finalizar y Volver al Inicio</span>
@@ -496,17 +569,17 @@
     </section>
 
     <!-- ===================================================================== -->
-    <!-- VISTA 5: PANEL ADMINISTRATIVO DOCENTE (IMPORTACIÓN, CONTRASTE, EXCEL) -->
+    <!-- VISTA 5: PANEL ADMINISTRATIVO DOCENTE (GESTIÓN INTEGRAL Y MULTIMEDIA) -->
     <!-- ===================================================================== -->
     <section id="viewAdmin" class="hidden space-y-6">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="bg-white dark:bg-[#0b1222] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div>
-          <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 mb-1.5">
+          <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/15 text-blue-600 dark:text-blue-300 border border-blue-500/30 mb-1.5">
             Administración y Orientación Vocacional
           </span>
-          <h2 class="text-xl sm:text-2xl font-bold text-white">Panel de Control Docente — Grado 8°</h2>
-          <p class="text-xs sm:text-sm text-slate-400 mt-0.5">
-            Gestiona la base de datos de estudiantes, contrasta los puntajes ocultos del test con la selección directa y exporta reportes.
+          <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Panel de Control Docente — Grado 8°</h2>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+            Administra fotos y videos de las Ramas, gestiona estudiantes, contrasta puntajes ocultos y exporta reportes.
           </p>
         </div>
 
@@ -514,7 +587,7 @@
           <button
             type="button"
             id="btnSyncNow"
-            class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 text-xs sm:text-sm font-semibold transition inline-flex items-center gap-2 cursor-pointer"
+            class="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-blue-600 dark:text-sky-300 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-semibold transition inline-flex items-center gap-2 cursor-pointer"
             title="Descargar cambios recientes desde Supabase"
           >
             <i data-lucide="refresh-cw" class="w-4 h-4"></i>
@@ -523,7 +596,7 @@
 
           <label
             for="inputMergeExcel"
-            class="px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-sky-950/50 transition inline-flex items-center gap-2 cursor-pointer"
+            class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-blue-950/40 transition inline-flex items-center gap-2 cursor-pointer"
             title="Combina archivos Excel exportados desde distintos equipos sin duplicar estudiantes"
           >
             <i data-lucide="git-merge" class="w-4 h-4"></i>
@@ -534,7 +607,7 @@
           <button
             type="button"
             id="btnExportExcel"
-            class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-emerald-950/50 transition inline-flex items-center gap-2 cursor-pointer"
+            class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold shadow-lg shadow-emerald-950/40 transition inline-flex items-center gap-2 cursor-pointer"
           >
             <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
             <span>Exportar Resultados (.xlsx)</span>
@@ -543,7 +616,7 @@
           <button
             type="button"
             id="btnCloseAdmin"
-            class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm font-medium border border-slate-700 transition inline-flex items-center gap-2 cursor-pointer"
+            class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-medium border border-slate-200 dark:border-slate-700 transition inline-flex items-center gap-2 cursor-pointer"
           >
             <i data-lucide="arrow-left" class="w-4 h-4"></i>
             <span>Vista Estudiante</span>
@@ -553,58 +626,106 @@
 
       <!-- KPIs -->
       <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-          <p class="text-xs text-slate-400 font-medium">Total Matriculados</p>
-          <p id="kpiTotalStudents" class="text-2xl font-extrabold text-white mt-1">0</p>
+        <div class="bg-white dark:bg-[#0b1222] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
+          <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Total Matriculados</p>
+          <p id="kpiTotalStudents" class="text-2xl font-extrabold text-slate-900 dark:text-white mt-1">0</p>
         </div>
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-          <p class="text-xs text-slate-400 font-medium">Completados</p>
-          <p id="kpiCompleted" class="text-2xl font-extrabold text-emerald-400 mt-1">0</p>
+        <div class="bg-white dark:bg-[#0b1222] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
+          <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Completados</p>
+          <p id="kpiCompleted" class="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1">0</p>
         </div>
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-          <p class="text-xs text-slate-400 font-medium">Pendientes</p>
-          <p id="kpiPending" class="text-2xl font-extrabold text-amber-400 mt-1">0</p>
+        <div class="bg-white dark:bg-[#0b1222] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
+          <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Pendientes</p>
+          <p id="kpiPending" class="text-2xl font-extrabold text-amber-500 dark:text-amber-400 mt-1">0</p>
         </div>
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-          <p class="text-xs text-slate-400 font-medium">Coincidencia Test vs 1.ª Op.</p>
-          <p id="kpiCoincidence" class="text-2xl font-extrabold text-sky-400 mt-1">0%</p>
+        <div class="bg-white dark:bg-[#0b1222] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
+          <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Coincidencia Test vs 1.ª Op.</p>
+          <p id="kpiCoincidence" class="text-2xl font-extrabold text-blue-600 dark:text-sky-400 mt-1">0%</p>
         </div>
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 col-span-2 lg:col-span-1">
-          <p class="text-xs text-slate-400 font-medium">Discrepancias (Alerta)</p>
-          <p id="kpiDiscrepancy" class="text-2xl font-extrabold text-rose-400 mt-1">0</p>
+        <div class="bg-white dark:bg-[#0b1222] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 col-span-2 lg:col-span-1 shadow-sm">
+          <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Discrepancias (Alerta)</p>
+          <p id="kpiDiscrepancy" class="text-2xl font-extrabold text-rose-500 dark:text-rose-400 mt-1">0</p>
+        </div>
+      </div>
+
+      <!-- Gestor Multimedia de Fotos y Videos YouTube de las 5 Ramas -->
+      <div class="bg-white dark:bg-[#0b1222] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200 dark:border-slate-800">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <i data-lucide="film" class="w-5 h-5 text-blue-500"></i>
+              Personalización de Fotos y Videos de YouTube por Rama Técnica
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Cambia las fotos de portada (Vista 1) y los enlaces de YouTube (Vista 2) de cada Rama. Se sincronizan en la nube para todos los estudiantes.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              id="btnToggleMediaEditor"
+              class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition inline-flex items-center gap-1.5 cursor-pointer"
+            >
+              <i data-lucide="chevron-down" id="mediaEditorChevron" class="w-4 h-4 transition-transform"></i>
+              <span>Mostrar / Ocultar Editor Multimedia</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="mediaEditorBody" class="hidden pt-4 space-y-4">
+          <div id="mediaBranchesFormGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-200 dark:border-slate-800">
+            <button
+              type="button"
+              id="btnResetDefaultMedia"
+              class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition cursor-pointer"
+            >
+              Restaurar Fotos por Defecto
+            </button>
+
+            <button
+              type="button"
+              id="btnSaveBranchesMedia"
+              class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-semibold shadow-md transition inline-flex items-center gap-2 cursor-pointer"
+            >
+              <i data-lucide="save" class="w-4 h-4"></i>
+              <span>Guardar Fotos y Videos en la Nube</span>
+            </button>
+          </div>
         </div>
       </div>
 
       <!-- Resumen de Distribución Final por Rama Técnica -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+      <div class="bg-white dark:bg-[#0b1222] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-4">
           <div>
-            <h3 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
-              <i data-lucide="layers" class="w-4 h-4 text-emerald-400"></i>
+            <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <i data-lucide="layers" class="w-4 h-4 text-emerald-500"></i>
               Distribución Oficial y Control de Cupos por Rama Técnica
             </h3>
-            <p class="text-xs text-slate-400">
-              Cupo máximo configurable por taller (por defecto <strong class="text-slate-200">35 estudiantes</strong>). Al exportar a Excel se crea una pestaña por cada Rama.
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+              Cupo máximo configurable por taller (por defecto <strong class="text-slate-800 dark:text-slate-200">35 estudiantes</strong>). Al exportar a Excel se crea una pestaña por cada Rama.
             </p>
           </div>
           <div class="flex flex-wrap items-center gap-2">
-            <div class="flex items-center gap-1.5 bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5">
-              <label for="inputMaxQuota" class="text-[11px] text-slate-400 font-medium">Cupo máx/Rama:</label>
+            <div class="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5">
+              <label for="inputMaxQuota" class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Cupo máx/Rama:</label>
               <input
                 type="number"
                 id="inputMaxQuota"
                 min="1"
                 max="200"
                 value="35"
-                class="w-14 bg-slate-900 border border-slate-700 rounded text-xs font-bold text-white text-center py-0.5 focus:outline-none focus:border-emerald-500"
+                class="w-14 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded text-xs font-bold text-slate-900 dark:text-white text-center py-0.5 focus:outline-none focus:border-blue-500"
               />
             </div>
 
             <button
               type="button"
               id="btnSmartDistribute"
-              class="px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white shadow-md shadow-emerald-950/50 transition inline-flex items-center gap-1.5 cursor-pointer"
-              title="Asigna primero a coincidentes (1.ª opción) y luego a quienes coinciden con su 2.ª opción respetando el cupo máximo de 35"
+              class="px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white shadow-md shadow-emerald-950/40 transition inline-flex items-center gap-1.5 cursor-pointer"
+              title="Asigna primero a coincidentes (1.ª opción) y luego a quienes coinciden con su 2.ª opción respetando el cupo máximo"
             >
               <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
               <span>Asistente de Distribución Inteligente</span>
@@ -613,57 +734,57 @@
         </div>
 
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-          <div class="p-3.5 rounded-xl bg-slate-950 border border-emerald-500/30">
+          <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-emerald-500/30">
             <div class="flex items-center justify-between">
-              <p class="text-[11px] font-semibold text-emerald-400 uppercase">Agropecuaria</p>
-              <span id="quotaBadgeAgro" class="text-[11px] font-bold text-slate-400">0 / 35</span>
+              <p class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase">Agropecuaria</p>
+              <span id="quotaBadgeAgro" class="text-[11px] font-bold text-slate-500 dark:text-slate-400">0 / 35</span>
             </div>
-            <p id="distAgro" class="text-xl font-extrabold text-white mt-1">0</p>
-            <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden mt-2">
+            <p id="distAgro" class="text-xl font-extrabold text-slate-900 dark:text-white mt-1">0</p>
+            <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden mt-2">
               <div id="barQuotaAgro" class="h-full bg-emerald-500 transition-all duration-300" style="width: 0%"></div>
             </div>
           </div>
 
-          <div class="p-3.5 rounded-xl bg-slate-950 border border-sky-500/30">
+          <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-blue-500/30">
             <div class="flex items-center justify-between">
-              <p class="text-[11px] font-semibold text-sky-400 uppercase">Comercial</p>
-              <span id="quotaBadgeComercial" class="text-[11px] font-bold text-slate-400">0 / 35</span>
+              <p class="text-[11px] font-semibold text-blue-600 dark:text-sky-400 uppercase">Comercial</p>
+              <span id="quotaBadgeComercial" class="text-[11px] font-bold text-slate-500 dark:text-slate-400">0 / 35</span>
             </div>
-            <p id="distComercial" class="text-xl font-extrabold text-white mt-1">0</p>
-            <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden mt-2">
-              <div id="barQuotaComercial" class="h-full bg-sky-500 transition-all duration-300" style="width: 0%"></div>
+            <p id="distComercial" class="text-xl font-extrabold text-slate-900 dark:text-white mt-1">0</p>
+            <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden mt-2">
+              <div id="barQuotaComercial" class="h-full bg-blue-500 transition-all duration-300" style="width: 0%"></div>
             </div>
           </div>
 
-          <div class="p-3.5 rounded-xl bg-slate-950 border border-amber-500/30">
+          <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-amber-500/30">
             <div class="flex items-center justify-between">
-              <p class="text-[11px] font-semibold text-amber-400 uppercase">Ind. Metalmecánica</p>
-              <span id="quotaBadgeMetal" class="text-[11px] font-bold text-slate-400">0 / 35</span>
+              <p class="text-[11px] font-semibold text-amber-600 dark:text-amber-400 uppercase">Ind. Metalmecánica</p>
+              <span id="quotaBadgeMetal" class="text-[11px] font-bold text-slate-500 dark:text-slate-400">0 / 35</span>
             </div>
-            <p id="distMetal" class="text-xl font-extrabold text-white mt-1">0</p>
-            <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden mt-2">
+            <p id="distMetal" class="text-xl font-extrabold text-slate-900 dark:text-white mt-1">0</p>
+            <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden mt-2">
               <div id="barQuotaMetal" class="h-full bg-amber-500 transition-all duration-300" style="width: 0%"></div>
             </div>
           </div>
 
-          <div class="p-3.5 rounded-xl bg-slate-950 border border-orange-500/30">
+          <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-orange-500/30">
             <div class="flex items-center justify-between">
-              <p class="text-[11px] font-semibold text-orange-400 uppercase">Ind. Electricidad</p>
-              <span id="quotaBadgeElec" class="text-[11px] font-bold text-slate-400">0 / 35</span>
+              <p class="text-[11px] font-semibold text-orange-600 dark:text-orange-400 uppercase">Ind. Electricidad</p>
+              <span id="quotaBadgeElec" class="text-[11px] font-bold text-slate-500 dark:text-slate-400">0 / 35</span>
             </div>
-            <p id="distElec" class="text-xl font-extrabold text-white mt-1">0</p>
-            <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden mt-2">
+            <p id="distElec" class="text-xl font-extrabold text-slate-900 dark:text-white mt-1">0</p>
+            <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden mt-2">
               <div id="barQuotaElec" class="h-full bg-orange-500 transition-all duration-300" style="width: 0%"></div>
             </div>
           </div>
 
-          <div class="p-3.5 rounded-xl bg-slate-950 border border-rose-500/30 col-span-2 sm:col-span-1">
+          <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-rose-500/30 col-span-2 sm:col-span-1">
             <div class="flex items-center justify-between">
-              <p class="text-[11px] font-semibold text-rose-400 uppercase">Promoción Social</p>
-              <span id="quotaBadgeSocial" class="text-[11px] font-bold text-slate-400">0 / 35</span>
+              <p class="text-[11px] font-semibold text-rose-600 dark:text-rose-400 uppercase">Promoción Social</p>
+              <span id="quotaBadgeSocial" class="text-[11px] font-bold text-slate-500 dark:text-slate-400">0 / 35</span>
             </div>
-            <p id="distSocial" class="text-xl font-extrabold text-white mt-1">0</p>
-            <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden mt-2">
+            <p id="distSocial" class="text-xl font-extrabold text-slate-900 dark:text-white mt-1">0</p>
+            <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden mt-2">
               <div id="barQuotaSocial" class="h-full bg-rose-500 transition-all duration-300" style="width: 0%"></div>
             </div>
           </div>
@@ -671,22 +792,22 @@
       </div>
 
       <!-- Gráfico Comparativo -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+      <div class="bg-white dark:bg-[#0b1222] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
-            <h3 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
-              <i data-lucide="bar-chart-3" class="w-4 h-4 text-sky-400"></i>
+            <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <i data-lucide="bar-chart-3" class="w-4 h-4 text-blue-500"></i>
               Análisis Comparativo: Demanda Directa vs. Vocación Real (Test)
             </h3>
-            <p class="text-xs text-slate-400">
+            <p class="text-xs text-slate-500 dark:text-slate-400">
               Permite sustentar ante Consejo Académico y padres de familia la diferencia entre lo que los estudiantes piden y su afinidad real.
             </p>
           </div>
           <div class="flex items-center gap-4 text-xs">
-            <span class="inline-flex items-center gap-1.5 text-slate-300">
-              <span class="w-2.5 h-2.5 rounded-sm bg-sky-500"></span> 1.ª Opción Elegida (Directa)
+            <span class="inline-flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
+              <span class="w-2.5 h-2.5 rounded-sm bg-blue-500"></span> 1.ª Opción Elegida (Directa)
             </span>
-            <span class="inline-flex items-center gap-1.5 text-slate-300">
+            <span class="inline-flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
               <span class="w-2.5 h-2.5 rounded-sm bg-emerald-500"></span> Mayor Puntaje en Test
             </span>
           </div>
@@ -696,81 +817,94 @@
 
       <!-- Carga de Excel y Configuración Cloud -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-          <div class="flex items-start justify-between gap-3">
+        <div class="bg-white dark:bg-[#0b1222] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-4 shadow-sm">
+          <div class="flex flex-wrap items-start justify-between gap-2">
             <div>
-              <h3 class="text-base font-bold text-white flex items-center gap-2">
-                <i data-lucide="upload-cloud" class="w-5 h-5 text-emerald-400"></i>
-                Importar Base de Datos (Excel / CSV)
+              <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <i data-lucide="upload-cloud" class="w-5 h-5 text-emerald-500"></i>
+                Importar y Gestionar Base de Datos
               </h3>
-              <p class="text-xs text-slate-400 mt-1">
-                Columnas requeridas: <code class="text-emerald-300 bg-slate-950 px-1.5 py-0.5 rounded">Numero_Identidad</code>, <code class="text-emerald-300 bg-slate-950 px-1.5 py-0.5 rounded">Nombre_Completo</code>, <code class="text-emerald-300 bg-slate-950 px-1.5 py-0.5 rounded">Grado</code>, <code class="text-emerald-300 bg-slate-950 px-1.5 py-0.5 rounded">Sección</code>.
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Columnas: <code class="text-emerald-600 dark:text-emerald-300 bg-slate-100 dark:bg-slate-950 px-1.5 py-0.5 rounded">Numero_Identidad</code>, <code class="text-emerald-600 dark:text-emerald-300 bg-slate-100 dark:bg-slate-950 px-1.5 py-0.5 rounded">Nombre_Completo</code>, <code class="text-emerald-600 dark:text-emerald-300 bg-slate-100 dark:bg-slate-950 px-1.5 py-0.5 rounded">Grado</code>, <code class="text-emerald-600 dark:text-emerald-300 bg-slate-100 dark:bg-slate-950 px-1.5 py-0.5 rounded">Sección</code>.
               </p>
             </div>
-            <button
-              type="button"
-              id="btnDownloadTemplate"
-              class="shrink-0 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-sky-300 border border-slate-700 transition cursor-pointer"
-            >
-              Plantilla .xlsx
-            </button>
+            <div class="flex items-center gap-1.5">
+              <button
+                type="button"
+                id="btnDownloadTemplate"
+                class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs text-blue-600 dark:text-sky-300 border border-slate-200 dark:border-slate-700 transition cursor-pointer"
+                title="Descargar formato Excel de ejemplo"
+              >
+                Plantilla .xlsx
+              </button>
+              <button
+                type="button"
+                id="btnWipeDatabase"
+                class="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/70 dark:hover:bg-rose-900/80 text-xs text-rose-600 dark:text-rose-300 border border-rose-200 dark:border-rose-800/70 transition inline-flex items-center gap-1 cursor-pointer"
+                title="Eliminar toda la base de datos de estudiantes (Nube + Local) para subir una nueva"
+              >
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                <span>Vaciar Base</span>
+              </button>
+            </div>
           </div>
 
-          <label class="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-slate-700 hover:border-emerald-500/60 rounded-xl bg-slate-950/60 cursor-pointer transition p-4 text-center">
+          <label class="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-blue-500/60 rounded-xl bg-slate-50 dark:bg-slate-950/60 cursor-pointer transition p-4 text-center">
             <i data-lucide="file-plus-2" class="w-7 h-7 text-slate-400 mb-1.5"></i>
-            <span class="text-xs sm:text-sm font-medium text-slate-200">Haz clic para seleccionar tu archivo Excel (.xlsx, .xls, .csv)</span>
+            <span class="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-200">Haz clic para seleccionar tu archivo Excel (.xlsx, .xls, .csv)</span>
             <span class="text-[11px] text-slate-500 mt-0.5">Se sincronizará automáticamente con Supabase para todos los dispositivos</span>
             <input type="file" id="inputExcelFile" accept=".xlsx,.xls,.csv" class="hidden" />
           </label>
         </div>
 
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3">
-          <h3 class="text-base font-bold text-white flex items-center gap-2">
-            <i data-lucide="database" class="w-5 h-5 text-sky-400"></i>
-            Sincronización Multi-Equipo (Supabase Conectado)
+        <div class="bg-white dark:bg-[#0b1222] border border-slate-200 dark:border-slate-800 rounded-2xl p-5 space-y-3 shadow-sm">
+          <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <i data-lucide="database" class="w-5 h-5 text-blue-500"></i>
+            Sincronización Multi-Equipo y Clave Docente
           </h3>
-          <p class="text-xs text-slate-400">
-            El PIN docente, cupos y estudiantes se sincronizan en la nube para que funcionen igual en cualquier computador o celular.
+          <p class="text-xs text-slate-500 dark:text-slate-400">
+            El PIN docente, cupos, multimedia y estudiantes se sincronizan en la nube para funcionar igual en cualquier computador o celular.
           </p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <input
               type="text"
               id="inputSupabaseUrl"
               placeholder="Supabase URL (https://xxx.supabase.co)"
-              class="px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+              class="px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500"
             />
             <input
               type="password"
               id="inputSupabaseKey"
               placeholder="Supabase Publishable / Anon Key"
-              class="px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+              class="px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500"
             />
           </div>
           <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
             <div class="flex items-center gap-2">
-              <label for="inputNewPin" class="text-xs text-slate-400">PIN Docente:</label>
+              <label for="inputNewPin" class="text-xs text-slate-600 dark:text-slate-400">PIN Docente:</label>
               <input
                 type="text"
                 id="inputNewPin"
                 maxlength="8"
                 placeholder="1234"
-                class="w-24 px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white text-center"
+                class="w-24 px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-white text-center"
               />
             </div>
             <div class="flex items-center gap-2">
               <button
                 type="button"
                 id="btnSaveSettings"
-                class="px-3.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold transition cursor-pointer"
+                class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition cursor-pointer"
               >
                 Guardar Configuración
               </button>
               <button
                 type="button"
                 id="btnClearAllData"
-                class="px-3 py-1.5 rounded-lg bg-rose-950/70 hover:bg-rose-900/70 text-rose-300 border border-rose-800/60 text-xs font-medium transition cursor-pointer"
+                class="px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/70 dark:hover:bg-rose-900/70 text-rose-600 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60 text-xs font-medium transition cursor-pointer"
+                title="Borra únicamente las respuestas locales del test manteniendo la lista de estudiantes"
               >
-                Limpiar Todo
+                Reiniciar Respuestas
               </button>
             </div>
           </div>
@@ -778,15 +912,24 @@
       </div>
 
       <!-- Tabla Matriz de Contraste -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
-        <div class="p-4 sm:p-5 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div class="bg-white dark:bg-[#0b1222] border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+        <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           <div>
-            <h3 class="text-base font-bold text-white">Matriz de Contraste: Test Vocacional vs. Selección Directa</h3>
-            <p class="text-xs text-slate-400">Diferencia ≥ 3 pts = Interés claro • Diferencia &lt; 3 pts = Perfil mixto</p>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white">Matriz de Contraste: Test Vocacional vs. Selección Directa</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Diferencia ≥ 3 pts = Interés claro • Diferencia &lt; 3 pts = Perfil mixto</p>
           </div>
 
           <div class="flex flex-wrap items-center gap-2">
-            <select id="filterSection" class="px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white">
+            <button
+              type="button"
+              id="btnOpenAddStudent"
+              class="w-full sm:w-auto px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-sm transition inline-flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+              <span>+ Agregar Estudiante</span>
+            </button>
+
+            <select id="filterSection" class="flex-1 sm:flex-none px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white">
               <option value="ALL">Todas las secciones</option>
               <option value="8°-1">8°-1</option>
               <option value="8°-2">8°-2</option>
@@ -794,7 +937,7 @@
               <option value="8°-4">8°-4</option>
             </select>
 
-            <select id="filterStatus" class="px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white">
+            <select id="filterStatus" class="flex-1 sm:flex-none px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white">
               <option value="ALL">Todos los estados</option>
               <option value="COMPLETED">Completados</option>
               <option value="PENDING">Pendientes</option>
@@ -805,15 +948,19 @@
               type="text"
               id="filterSearch"
               placeholder="Buscar nombre o ID..."
-              class="px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-500 w-44"
+              class="w-full sm:w-44 px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white placeholder-slate-400"
             />
           </div>
         </div>
 
-        <div class="overflow-x-auto">
+        <!-- Vista de Tarjetas Responsivas para Celular y Tableta (< lg) -->
+        <div id="adminMobileCards" class="lg:hidden divide-y divide-slate-200 dark:divide-slate-800/80"></div>
+
+        <!-- Vista de Tabla para Escritorio (>= lg) -->
+        <div class="hidden lg:block overflow-x-auto">
           <table class="w-full text-left border-collapse text-xs">
             <thead>
-              <tr class="bg-slate-950/90 text-slate-400 border-b border-slate-800 uppercase tracking-wider">
+              <tr class="bg-slate-100 dark:bg-slate-950/90 text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 uppercase tracking-wider">
                 <th class="py-3 px-4 font-semibold">Estudiante</th>
                 <th class="py-3 px-3 font-semibold">Sección</th>
                 <th class="py-3 px-3 font-semibold">Puntajes Test (/12)</th>
@@ -821,10 +968,10 @@
                 <th class="py-3 px-3 font-semibold">Selección Directa (1ª / 2ª / 3ª)</th>
                 <th class="py-3 px-3 font-semibold">Contraste y Control</th>
                 <th class="py-3 px-3 font-semibold">Rama Final Asignada</th>
-                <th class="py-3 px-3 font-semibold text-right">Acción</th>
+                <th class="py-3 px-3 font-semibold text-right">Acciones</th>
               </tr>
             </thead>
-            <tbody id="adminTableBody" class="divide-y divide-slate-800/80"></tbody>
+            <tbody id="adminTableBody" class="divide-y divide-slate-200 dark:divide-slate-800/80"></tbody>
           </table>
         </div>
       </div>
@@ -832,20 +979,100 @@
 
   </main>
 
-  <!-- Modal PIN Docente -->
-  <div id="modalPin" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-6 shadow-2xl">
+  <!-- Modal Agregar / Editar Estudiante -->
+  <div id="modalStudentForm" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <i data-lucide="lock" class="w-4 h-4 text-emerald-400"></i>
-          Acceso Restringido Docente
+        <h3 id="studentModalTitle" class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <i data-lucide="user-plus" class="w-4 h-4 text-emerald-500"></i>
+          <span>Agregar Estudiante</span>
         </h3>
-        <button type="button" id="btnClosePinModal" class="text-slate-400 hover:text-white cursor-pointer">
+        <button type="button" id="btnCloseStudentModal" class="text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
-      <p class="text-xs text-slate-400 mb-4">
-        Ingresa el PIN administrativo para gestionar la base de datos y ver los resultados del test (PIN inicial por defecto: <strong class="text-slate-200">1234</strong>).
+
+      <form id="formStudentCRUD" class="space-y-3.5">
+        <input type="hidden" id="editOriginalDocId" value="" />
+
+        <div>
+          <label for="crudDocId" class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+            Número de Identidad <span class="text-rose-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="crudDocId"
+            inputmode="numeric"
+            placeholder="Ej: 1067894512"
+            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
+            required
+          />
+        </div>
+
+        <div>
+          <label for="crudFullName" class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+            Nombre Completo <span class="text-rose-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="crudFullName"
+            placeholder="Apellidos y Nombres completos"
+            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
+            required
+          />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="crudGrade" class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Grado</label>
+            <input
+              type="text"
+              id="crudGrade"
+              value="8°"
+              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
+              required
+            />
+          </div>
+          <div>
+            <label for="crudSection" class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Sección</label>
+            <select
+              id="crudSection"
+              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
+            >
+              <option value="8°-1">8°-1</option>
+              <option value="8°-2">8°-2</option>
+              <option value="8°-3">8°-3</option>
+              <option value="8°-4">8°-4</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2.5 pt-3 border-t border-slate-200 dark:border-slate-800">
+          <button type="button" id="btnCancelStudentCRUD" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
+            Cancelar
+          </button>
+          <button type="submit" id="btnSaveStudentCRUD" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white cursor-pointer">
+            Guardar Estudiante
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal PIN Docente -->
+  <div id="modalPin" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl max-w-sm w-full p-6 shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <i data-lucide="lock" class="w-4 h-4 text-blue-500"></i>
+          Acceso Restringido Docente
+        </h3>
+        <button type="button" id="btnClosePinModal" class="text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <p class="text-xs text-slate-600 dark:text-slate-400 mb-4">
+        Ingresa el PIN administrativo para gestionar la base de datos, fotos/videos y resultados del test (PIN inicial: <strong class="text-slate-900 dark:text-slate-200">1234</strong>).
       </p>
       <form id="formPin" class="space-y-3">
         <input
@@ -853,14 +1080,14 @@
           id="inputPinCheck"
           inputmode="numeric"
           placeholder="••••"
-          class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-center text-lg tracking-widest text-white focus:outline-none focus:border-emerald-500"
+          class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-center text-lg tracking-widest text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
           required
         />
-        <p id="pinErrorMsg" class="hidden text-xs text-rose-400 text-center">PIN incorrecto. Intenta nuevamente.</p>
+        <p id="pinErrorMsg" class="hidden text-xs text-rose-500 dark:text-rose-400 text-center">PIN incorrecto. Intenta nuevamente.</p>
         <button
           type="submit"
           id="btnSubmitPin"
-          class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition cursor-pointer"
+          class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition cursor-pointer"
         >
           Ingresar al Panel
         </button>
@@ -870,11 +1097,11 @@
 
   <!-- Modal Confirmación Personalizada -->
   <div id="modalConfirm" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4">
-      <h3 id="confirmTitle" class="text-base font-bold text-white">Confirmar acción</h3>
-      <p id="confirmMessage" class="text-xs sm:text-sm text-slate-300 leading-relaxed"></p>
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4">
+      <h3 id="confirmTitle" class="text-base font-bold text-slate-900 dark:text-white">Confirmar acción</h3>
+      <p id="confirmMessage" class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed"></p>
       <div class="flex justify-end gap-2.5 pt-2">
-        <button type="button" id="btnConfirmCancel" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 cursor-pointer">
+        <button type="button" id="btnConfirmCancel" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer">
           Cancelar
         </button>
         <button type="button" id="btnConfirmAccept" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-xs font-semibold text-white cursor-pointer">
@@ -942,6 +1169,64 @@
       key: 'sb_publishable_SnWYbNQK8HZ46EhZbY2uOw__16mCBMI'
     };
 
+    const DEFAULT_BRANCHES_CATALOG = [
+      {
+        key: 'Agropecuaria',
+        badge: 'Rama Técnica Agropecuaria',
+        title: 'Agropecuaria',
+        shortDesc: 'Producción agrícola y pecuaria sostenible, manejo de especies, piscicultura y cuidado de recursos naturales.',
+        fullDesc: 'Formación práctica en producción de cultivos regionales, manejo técnico de especies animales, piscicultura, conservación de suelos y aguas, y administración moderna de proyectos agropecuarios.',
+        accent: 'emerald',
+        icon: 'sprout',
+        photoUrl: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=900&q=80',
+        youtubeUrl: ''
+      },
+      {
+        key: 'Comercial',
+        badge: 'Rama Técnica Comercial',
+        title: 'Comercial',
+        shortDesc: 'Gestión de negocios, contabilidad básica, finanzas, emprendimiento, costos y atención al cliente.',
+        fullDesc: 'Desarrollo de competencias en contabilidad comercial, presupuestos, finanzas personales y empresariales, creación de emprendimientos, logística de ventas y servicio al cliente.',
+        accent: 'blue',
+        icon: 'briefcase',
+        photoUrl: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=900&q=80',
+        youtubeUrl: ''
+      },
+      {
+        key: 'Industrial - Metalmecánica',
+        badge: 'Rama Técnica Industrial',
+        title: 'Industrial · Metalmecánica',
+        shortDesc: 'Trabajo con metales, soldadura, máquinas herramienta como el torno, ajuste mecánico y medición de precisión.',
+        fullDesc: 'Especialización en procesos de manufactura metalmecánica, soldadura eléctrica y autógena, operación de torno y fresadora, metrología de precisión y mantenimiento mecánico industrial.',
+        accent: 'amber',
+        icon: 'wrench',
+        photoUrl: 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=900&q=80',
+        youtubeUrl: ''
+      },
+      {
+        key: 'Industrial - Electricidad',
+        badge: 'Rama Técnica Industrial',
+        title: 'Industrial · Electricidad',
+        shortDesc: 'Instalaciones eléctricas residenciales, diseño de circuitos, diagnóstico de equipos y sistemas solares fotovoltaicos.',
+        fullDesc: 'Formación técnica en montaje de circuitos eléctricos residenciales e industriales, automatización básica, diagnóstico de fallas e instalación de sistemas de energía solar fotovoltaica.',
+        accent: 'orange',
+        icon: 'zap',
+        photoUrl: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=900&q=80',
+        youtubeUrl: ''
+      },
+      {
+        key: 'Promoción Social',
+        badge: 'Rama Técnica Promoción Social',
+        title: 'Promoción Social',
+        shortDesc: 'Bienestar comunitario, salud preventiva, primeros auxilios, educación en salud y saneamiento ambiental.',
+        fullDesc: 'Enfoque en salud pública comunitaria, epidemiología básica, primeros auxilios, microbiología aplicada, saneamiento ambiental y promoción de la salud sexual y reproductiva.',
+        accent: 'rose',
+        icon: 'heart-pulse',
+        photoUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=900&q=80',
+        youtubeUrl: ''
+      }
+    ];
+
     const QUESTIONS_BANK = [
       { id: 1, rama: 'Agropecuaria', text: 'Me gusta cuidar animales (vacas, cerdos, gallinas, búfalos).' },
       { id: 2, rama: 'Comercial', text: 'Disfruto vender o convencer a otros de que compren algo.' },
@@ -975,7 +1260,8 @@
     const STORAGE_KEYS = {
       STUDENTS: 'inem_ramas_students_v1',
       RESULTS: 'inem_ramas_results_v1',
-      SETTINGS: 'inem_ramas_settings_v1'
+      SETTINGS: 'inem_ramas_settings_v1',
+      THEME: 'inem_ramas_theme_v1'
     };
 
     const AppState = {
@@ -985,8 +1271,10 @@
         pin: '1234',
         maxQuota: 35,
         supabaseUrl: DEFAULT_SUPABASE_CONFIG.url,
-        supabaseKey: DEFAULT_SUPABASE_CONFIG.key
+        supabaseKey: DEFAULT_SUPABASE_CONFIG.key,
+        branchesMedia: {}
       },
+      isAdminAuthenticated: false,
       currentStudent: null,
       shuffledQuestions: [],
       studentAnswers: {},
@@ -998,8 +1286,75 @@
     };
 
     // =========================================================================
-    // UTILIDADES DE NORMALIZACIÓN Y CABECERAS SUPABASE (COMPATIBLE PUBLISHABLE)
+    // UTILIDADES GENERALES Y MULTIMEDIA (YOUTUBE / FOTOS)
     // =========================================================================
+    function sanitizeImageUrl(rawUrl, fallbackUrl = '') {
+      if (!rawUrl) return fallbackUrl;
+      const trimmed = String(rawUrl).trim();
+      if (/^(https?:\/\/|data:image\/)/i.test(trimmed)) {
+        return trimmed;
+      }
+      return fallbackUrl;
+    }
+
+    function getBranchCatalogItem(key) {
+      const base = DEFAULT_BRANCHES_CATALOG.find(b => b.key === key) || DEFAULT_BRANCHES_CATALOG[0];
+      const override = AppState.settings.branchesMedia?.[key] || {};
+      return {
+        ...base,
+        photoUrl: sanitizeImageUrl(override.photoUrl, base.photoUrl),
+        youtubeUrl: (override.youtubeUrl && override.youtubeUrl.trim()) ? override.youtubeUrl.trim() : base.youtubeUrl
+      };
+    }
+
+    function extractYouTubeEmbedUrl(rawUrl) {
+      if (!rawUrl) return '';
+      const url = String(rawUrl).trim();
+      let videoId = '';
+
+      const patterns = [
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/|youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/,
+        /[?&]v=([a-zA-Z0-9_-]{11})/
+      ];
+
+      for (const regex of patterns) {
+        const match = url.match(regex);
+        if (match && match[1]) {
+          videoId = match[1];
+          break;
+        }
+      }
+
+      if (!videoId) return '';
+      return `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`;
+    }
+
+    function compressImageFileToDataUrl(file, maxWidth = 800, quality = 0.78) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+          img.onerror = reject;
+          img.src = ev.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
 
     function normalizeSupabaseBaseUrl(rawUrl) {
       if (!rawUrl) return '';
@@ -1009,16 +1364,11 @@
         .replace(/\/$/, '');
     }
 
-    /**
-     * Construye cabeceras válidas tanto para llaves nuevas (sb_publishable_...)
-     * como para llaves clásicas JWT (eyJ...).
-     */
     function buildSupabaseHeaders(supabaseKey, extraHeaders = {}) {
       const headers = {
         'apikey': supabaseKey,
         ...extraHeaders
       };
-      // Solo agregar Authorization Bearer si la llave es un token JWT clásico (empieza por eyJ)
       if (supabaseKey && supabaseKey.startsWith('eyJ')) {
         headers['Authorization'] = `Bearer ${supabaseKey}`;
       }
@@ -1053,7 +1403,7 @@
         success: 'bg-emerald-950/95 border-emerald-500/60 text-emerald-100',
         error: 'bg-rose-950/95 border-rose-500/60 text-rose-100',
         warning: 'bg-amber-950/95 border-amber-500/60 text-amber-100',
-        info: 'bg-slate-900/95 border-sky-500/60 text-slate-100'
+        info: 'bg-slate-900/95 border-blue-500/60 text-slate-100'
       };
       const icons = {
         success: 'check-circle',
@@ -1100,13 +1450,45 @@
       };
     }
 
+    // =========================================================================
+    // TEMA CLARO / OSCURO
+    // =========================================================================
+    function applyTheme(theme) {
+      const html = document.documentElement;
+      const iconEl = document.getElementById('themeIcon');
+      if (theme === 'light') {
+        html.classList.remove('dark');
+        if (iconEl) iconEl.setAttribute('data-lucide', 'moon');
+      } else {
+        html.classList.add('dark');
+        if (iconEl) iconEl.setAttribute('data-lucide', 'sun');
+      }
+      localStorage.setItem(STORAGE_KEYS.THEME, theme);
+      lucide.createIcons();
+    }
+
+    document.getElementById('btnToggleTheme').addEventListener('click', () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      applyTheme(isDark ? 'light' : 'dark');
+    });
+
+    // =========================================================================
+    // PERSISTENCIA LOCAL Y NUBE (SUPABASE)
+    // =========================================================================
     async function loadState() {
+      const savedTheme = localStorage.getItem(STORAGE_KEYS.THEME) || 'dark';
+      applyTheme(savedTheme);
+
+      let hasLocalStudentsKey = false;
       try {
         const savedStudents = localStorage.getItem(STORAGE_KEYS.STUDENTS);
         const savedResults = localStorage.getItem(STORAGE_KEYS.RESULTS);
         const savedSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
 
-        if (savedStudents) AppState.students = JSON.parse(savedStudents);
+        if (savedStudents !== null) {
+          hasLocalStudentsKey = true;
+          AppState.students = JSON.parse(savedStudents);
+        }
         if (savedResults) AppState.results = JSON.parse(savedResults);
         if (savedSettings) {
           const parsed = JSON.parse(savedSettings);
@@ -1114,16 +1496,17 @@
             ...AppState.settings,
             ...parsed,
             supabaseUrl: normalizeSupabaseBaseUrl(parsed.supabaseUrl) || DEFAULT_SUPABASE_CONFIG.url,
-            supabaseKey: (parsed.supabaseKey && parsed.supabaseKey.trim()) ? parsed.supabaseKey.trim() : DEFAULT_SUPABASE_CONFIG.key
+            supabaseKey: (parsed.supabaseKey && parsed.supabaseKey.trim()) ? parsed.supabaseKey.trim() : DEFAULT_SUPABASE_CONFIG.key,
+            branchesMedia: parsed.branchesMedia || {}
           };
         }
       } catch (err) {
         console.error('Error al cargar estado local:', err);
       }
 
-      await pullFromSupabaseIfConfigured();
+      const cloudSynced = await pullFromSupabaseIfConfigured();
 
-      if (!AppState.students || AppState.students.length === 0) {
+      if (!cloudSynced && !hasLocalStudentsKey && (!AppState.students || AppState.students.length === 0)) {
         AppState.students = [
           { Numero_Identidad: '1001', Nombre_Completo: 'Valentina Gómez Pérez', Grado: '8°', Sección: '8°-1' },
           { Numero_Identidad: '1002', Nombre_Completo: 'Santiago Martínez Ruiz', Grado: '8°', Sección: '8°-2' },
@@ -1133,7 +1516,9 @@
         localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(AppState.students));
       }
 
-      updateSyncBadge();
+      renderLandingRamasPreview();
+      renderRamasShowcase();
+      updateSyncBadge(cloudSynced);
     }
 
     async function saveStudents() {
@@ -1157,7 +1542,7 @@
       const badge = document.getElementById('syncStatusBadge');
       if (AppState.settings.supabaseUrl && AppState.settings.supabaseKey) {
         if (cloudOk) {
-          badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span> Nube Supabase Conectada`;
+          badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span> Supabase Conectado`;
         } else {
           badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400"></span> Revisar Tablas Supabase`;
         }
@@ -1166,34 +1551,91 @@
       }
     }
 
+    async function syncStudentsToSupabase() {
+      const cleanUrl = normalizeSupabaseBaseUrl(AppState.settings.supabaseUrl);
+      const { supabaseKey } = AppState.settings;
+      if (!cleanUrl || !supabaseKey) return { ok: false, error: 'Sin credenciales Supabase' };
+      if (!AppState.students || AppState.students.length === 0) return { ok: true };
+
+      try {
+        const chunkSize = 100;
+        for (let i = 0; i < AppState.students.length; i += chunkSize) {
+          const chunk = AppState.students.slice(i, i + chunkSize).map(st => ({
+            numero_identidad: cleanId(st.Numero_Identidad),
+            nombre_completo: st.Nombre_Completo,
+            grado: st.Grado || '8°',
+            seccion: normalizeSection(st.Sección)
+          }));
+
+          const res = await fetch(`${cleanUrl}/rest/v1/orientacion_estudiantes?on_conflict=numero_identidad`, {
+            method: 'POST',
+            headers: buildSupabaseHeaders(supabaseKey, {
+              'Content-Type': 'application/json',
+              'Prefer': 'resolution=merge-duplicates,return=minimal'
+            }),
+            body: JSON.stringify(chunk)
+          });
+
+          if (!res.ok) {
+            const errText = await res.text();
+            return { ok: false, status: res.status, error: errText };
+          }
+        }
+        return { ok: true };
+      } catch (err) {
+        return { ok: false, error: err.message };
+      }
+    }
+
     async function syncSettingsToSupabase() {
       const cleanUrl = normalizeSupabaseBaseUrl(AppState.settings.supabaseUrl);
       const { supabaseKey } = AppState.settings;
       if (!cleanUrl || !supabaseKey) return { ok: false, error: 'Sin credenciales Supabase' };
 
+      const fullPayload = {
+        clave: 'global',
+        pin_docente: String(AppState.settings.pin || '1234'),
+        cupo_maximo: Number(AppState.settings.maxQuota || 35),
+        media_config: AppState.settings.branchesMedia || {},
+        actualizado_en: new Date().toISOString()
+      };
+
       try {
-        const res = await fetch(`${cleanUrl}/rest/v1/orientacion_config?on_conflict=clave`, {
+        let res = await fetch(`${cleanUrl}/rest/v1/orientacion_config?on_conflict=clave`, {
           method: 'POST',
           headers: buildSupabaseHeaders(supabaseKey, {
             'Content-Type': 'application/json',
             'Prefer': 'resolution=merge-duplicates,return=minimal'
           }),
-          body: JSON.stringify({
-            clave: 'global',
-            pin_docente: String(AppState.settings.pin || '1234'),
-            cupo_maximo: Number(AppState.settings.maxQuota || 35),
-            actualizado_en: new Date().toISOString()
-          })
+          body: JSON.stringify(fullPayload)
         });
 
         if (!res.ok) {
           const errText = await res.text();
-          console.warn('Error sincronizando configuración en Supabase:', res.status, errText);
+          if (errText.includes('media_config')) {
+            const fallbackRes = await fetch(`${cleanUrl}/rest/v1/orientacion_config?on_conflict=clave`, {
+              method: 'POST',
+              headers: buildSupabaseHeaders(supabaseKey, {
+                'Content-Type': 'application/json',
+                'Prefer': 'resolution=merge-duplicates,return=minimal'
+              }),
+              body: JSON.stringify({
+                clave: 'global',
+                pin_docente: String(AppState.settings.pin || '1234'),
+                cupo_maximo: Number(AppState.settings.maxQuota || 35),
+                actualizado_en: new Date().toISOString()
+              })
+            });
+            return {
+              ok: fallbackRes.ok,
+              needsMediaColumn: true,
+              error: 'Falta ejecutar en Supabase: ALTER TABLE public.orientacion_config ADD COLUMN IF NOT EXISTS media_config JSONB DEFAULT \'{}\'::jsonb;'
+            };
+          }
           return { ok: false, status: res.status, error: errText };
         }
         return { ok: true };
       } catch (err) {
-        console.warn('Fallo de red sincronizando configuración:', err);
         return { ok: false, error: err.message };
       }
     }
@@ -1244,42 +1686,88 @@
 
         if (!res.ok) {
           const errText = await res.text();
-          console.warn('Error sincronizando resultado en Supabase:', res.status, errText);
           return { ok: false, error: errText };
         }
         return { ok: true };
       } catch (err) {
-        console.warn('No se pudo sincronizar con Supabase:', err);
         return { ok: false, error: err.message };
       }
     }
 
-    async function syncStudentsToSupabase() {
+    async function deleteStudentFromSupabase(docId) {
       const cleanUrl = normalizeSupabaseBaseUrl(AppState.settings.supabaseUrl);
       const { supabaseKey } = AppState.settings;
-      if (!cleanUrl || !supabaseKey) return { ok: false, error: 'Sin credenciales Supabase' };
+      if (!cleanUrl || !supabaseKey) return { ok: true };
 
-      const uniqueMap = new Map();
-      AppState.students.forEach(s => {
-        const id = cleanId(s.Numero_Identidad);
-        if (id) {
-          uniqueMap.set(id, {
-            numero_identidad: id,
-            nombre_completo: String(s.Nombre_Completo || '').trim(),
-            grado: String(s.Grado || '8°').trim(),
-            seccion: normalizeSection(s.Sección)
-          });
-        }
-      });
+      try {
+        await fetch(`${cleanUrl}/rest/v1/orientacion_ramas?numero_identidad=eq.${encodeURIComponent(docId)}`, {
+          method: 'DELETE',
+          headers: buildSupabaseHeaders(supabaseKey)
+        });
+        const res = await fetch(`${cleanUrl}/rest/v1/orientacion_estudiantes?numero_identidad=eq.${encodeURIComponent(docId)}`, {
+          method: 'DELETE',
+          headers: buildSupabaseHeaders(supabaseKey)
+        });
+        return { ok: res.ok };
+      } catch (err) {
+        return { ok: false, error: err.message };
+      }
+    }
 
-      const payloadList = Array.from(uniqueMap.values());
-      if (payloadList.length === 0) return { ok: true, count: 0 };
+    async function wipeAllDatabaseFromSupabase() {
+      const cleanUrl = normalizeSupabaseBaseUrl(AppState.settings.supabaseUrl);
+      const { supabaseKey } = AppState.settings;
+      if (!cleanUrl || !supabaseKey) return { ok: true };
+
+      try {
+        const resRamas = await fetch(`${cleanUrl}/rest/v1/orientacion_ramas?numero_identidad=neq.__none__`, {
+          method: 'DELETE',
+          headers: buildSupabaseHeaders(supabaseKey)
+        });
+        const resEst = await fetch(`${cleanUrl}/rest/v1/orientacion_estudiantes?numero_identidad=neq.__none__`, {
+          method: 'DELETE',
+          headers: buildSupabaseHeaders(supabaseKey)
+        });
+        return { ok: resRamas.ok && resEst.ok };
+      } catch (err) {
+        return { ok: false, error: err.message };
+      }
+    }
+
+    async function wipeOnlyResultsFromSupabase() {
+      const cleanUrl = normalizeSupabaseBaseUrl(AppState.settings.supabaseUrl);
+      const { supabaseKey } = AppState.settings;
+      if (!cleanUrl || !supabaseKey) return { ok: true };
+
+      try {
+        const resRamas = await fetch(`${cleanUrl}/rest/v1/orientacion_ramas?numero_identidad=neq.__none__`, {
+          method: 'DELETE',
+          headers: buildSupabaseHeaders(supabaseKey)
+        });
+        return { ok: resRamas.ok };
+      } catch (err) {
+        return { ok: false, error: err.message };
+      }
+    }
+
+    async function syncResultsBatchToSupabase(recordsList) {
+      const cleanUrl = normalizeSupabaseBaseUrl(AppState.settings.supabaseUrl);
+      const { supabaseKey } = AppState.settings;
+      if (!cleanUrl || !supabaseKey) return { ok: false };
+
+      const validRecords = (recordsList || []).filter(r => r && r.Numero_Identidad && r.completed);
+      if (validRecords.length === 0) return { ok: true };
 
       try {
         const chunkSize = 100;
-        for (let i = 0; i < payloadList.length; i += chunkSize) {
-          const chunk = payloadList.slice(i, i + chunkSize);
-          const res = await fetch(`${cleanUrl}/rest/v1/orientacion_estudiantes?on_conflict=numero_identidad`, {
+        for (let i = 0; i < validRecords.length; i += chunkSize) {
+          const chunk = validRecords.slice(i, i + chunkSize).map(r => ({
+            numero_identidad: cleanId(r.Numero_Identidad),
+            datos: r,
+            actualizado_en: new Date().toISOString()
+          }));
+
+          const res = await fetch(`${cleanUrl}/rest/v1/orientacion_ramas?on_conflict=numero_identidad`, {
             method: 'POST',
             headers: buildSupabaseHeaders(supabaseKey, {
               'Content-Type': 'application/json',
@@ -1289,15 +1777,11 @@
           });
 
           if (!res.ok) {
-            const errText = await res.text();
-            console.error('Error Supabase al guardar estudiantes:', res.status, errText);
-            return { ok: false, status: res.status, error: errText };
+            return { ok: false, error: await res.text() };
           }
         }
-        updateSyncBadge(true);
-        return { ok: true, count: payloadList.length };
+        return { ok: true };
       } catch (err) {
-        console.error('Error de red al guardar estudiantes en Supabase:', err);
         return { ok: false, error: err.message };
       }
     }
@@ -1324,13 +1808,16 @@
             const cfg = cfgRows[0];
             if (cfg.pin_docente) AppState.settings.pin = String(cfg.pin_docente).trim();
             if (cfg.cupo_maximo) AppState.settings.maxQuota = Number(cfg.cupo_maximo);
+            if (cfg.media_config && typeof cfg.media_config === 'object') {
+              AppState.settings.branchesMedia = cfg.media_config;
+            }
             localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(AppState.settings));
           }
         }
 
         if (resSt.ok) {
           const rows = await resSt.json();
-          if (Array.isArray(rows) && rows.length > 0) {
+          if (Array.isArray(rows)) {
             AppState.students = rows.map(r => ({
               Numero_Identidad: cleanId(r.numero_identidad),
               Nombre_Completo: r.nombre_completo,
@@ -1350,7 +1837,7 @@
                 cloudResults[cleanId(r.numero_identidad)] = r.datos;
               }
             });
-            AppState.results = { ...AppState.results, ...cloudResults };
+            AppState.results = cloudResults;
             localStorage.setItem(STORAGE_KEYS.RESULTS, JSON.stringify(AppState.results));
           }
         }
@@ -1359,24 +1846,246 @@
         updateSyncBadge(allOk);
         return allOk;
       } catch (err) {
-        console.warn('Error al consultar Supabase:', err);
         updateSyncBadge(false);
         return false;
       }
     }
 
     // =========================================================================
-    // NAVEGACIÓN ENTRE VISTAS
+    // RENDERIZADO DE TARJETAS DE RAMAS (VISTA 1 PREVIEW Y VISTA 2 VIDEOS/CUPOS)
     // =========================================================================
+    function renderLandingRamasPreview() {
+      const container = document.getElementById('landingRamasList');
+      if (!container) return;
+
+      container.innerHTML = DEFAULT_BRANCHES_CATALOG.map(base => {
+        const item = getBranchCatalogItem(base.key);
+        const hasVideo = Boolean(extractYouTubeEmbedUrl(item.youtubeUrl));
+        return `
+          <div
+            onclick="navigateTopTab('viewRamasInfo')"
+            class="group bg-white dark:bg-[#0b1222] border border-slate-200 dark:border-slate-800/90 hover:border-blue-500/60 rounded-2xl p-3.5 flex items-center gap-4 shadow-sm hover:shadow-md transition cursor-pointer"
+          >
+            <div class="relative w-20 h-16 sm:w-24 sm:h-16 rounded-xl overflow-hidden bg-slate-800 shrink-0">
+              <img
+                src="${escapeHtml(item.photoUrl)}"
+                alt="${escapeHtml(item.title)}"
+                class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                onerror="this.src='https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=600&q=80'"
+              />
+              ${hasVideo ? `
+                <span class="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-rose-600/95 text-white text-[9px] font-bold inline-flex items-center gap-0.5 shadow">
+                  <i data-lucide="play" class="w-2.5 h-2.5 fill-current"></i> Video
+                </span>
+              ` : ''}
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between gap-2">
+                <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition truncate">
+                  ${escapeHtml(item.title)}
+                </h3>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 group-hover:text-blue-500 shrink-0 transition"></i>
+              </div>
+              <p class="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 mt-0.5 leading-relaxed">
+                ${escapeHtml(item.shortDesc)}
+              </p>
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function renderRamasShowcase() {
+      const grid = document.getElementById('ramasShowcaseGrid');
+      if (!grid) return;
+
+      const maxQuota = AppState.settings.maxQuota || 35;
+      const completedRecords = Object.values(AppState.results).filter(r => r && r.completed);
+
+      grid.innerHTML = DEFAULT_BRANCHES_CATALOG.map(base => {
+        const item = getBranchCatalogItem(base.key);
+        const embedUrl = extractYouTubeEmbedUrl(item.youtubeUrl);
+        const assignedCount = completedRecords.filter(r => r.assignedRama === item.key).length;
+        const availableSpots = Math.max(0, maxQuota - assignedCount);
+
+        const accentTextMap = {
+          emerald: 'text-emerald-600 dark:text-emerald-400',
+          blue: 'text-blue-600 dark:text-blue-400',
+          amber: 'text-amber-600 dark:text-amber-400',
+          orange: 'text-orange-600 dark:text-orange-400',
+          rose: 'text-rose-600 dark:text-rose-400'
+        };
+
+        return `
+          <article class="bg-white dark:bg-[#0b1222] border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-lg flex flex-col">
+            <!-- Cabecera Multimedia: Video YouTube si existe, o Foto de portada -->
+            <div class="relative aspect-video w-full bg-slate-900 overflow-hidden">
+              ${embedUrl ? `
+                <iframe
+                  src="${escapeHtml(embedUrl)}"
+                  title="Presentación ${escapeHtml(item.title)}"
+                  class="w-full h-full border-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen
+                  loading="lazy"
+                ></iframe>
+              ` : `
+                <img
+                  src="${escapeHtml(item.photoUrl)}"
+                  alt="${escapeHtml(item.title)}"
+                  class="w-full h-full object-cover"
+                  onerror="this.src='https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=900&q=80'"
+                />
+                <div class="absolute inset-0 bg-gradient-to-t from-[#0b1222]/70 via-transparent to-transparent"></div>
+                <span class="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-slate-950/80 text-slate-200 text-[11px] font-medium border border-slate-700/80 inline-flex items-center gap-1.5">
+                  <i data-lucide="image" class="w-3.5 h-3.5 text-blue-400"></i>
+                  <span>Presentación Visual (Video pendiente por docente)</span>
+                </span>
+              `}
+            </div>
+
+            <!-- Contenido de la tarjeta -->
+            <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-1.5">
+                  <span class="text-xs font-semibold ${accentTextMap[item.accent] || 'text-blue-400'}">
+                    ${escapeHtml(item.badge)}
+                  </span>
+                  <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
+                    Cupo: ${maxQuota} est. (${availableSpots} disp.)
+                  </span>
+                </div>
+                <h3 class="text-xl font-extrabold text-slate-900 dark:text-white mb-2">
+                  ${escapeHtml(item.title)}
+                </h3>
+                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                  ${escapeHtml(item.fullDesc)}
+                </p>
+              </div>
+
+              <div class="pt-3 border-t border-slate-200 dark:border-slate-800/80 flex items-center justify-between text-xs">
+                <span class="text-slate-500 dark:text-slate-400">Duración: <strong class="text-slate-800 dark:text-slate-200">9°, 10° y 11°</strong></span>
+                <button
+                  type="button"
+                  onclick="focusStudentIdInput()"
+                  class="font-semibold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
+                >
+                  <span>Postularme</span>
+                  <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      const selCards = document.getElementById('selectionRamasCards');
+      if (selCards) {
+        selCards.innerHTML = DEFAULT_BRANCHES_CATALOG.map(base => {
+          const item = getBranchCatalogItem(base.key);
+          return `
+            <div class="bg-white dark:bg-[#0b1222] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex items-start gap-3.5 shadow-sm">
+              <img
+                src="${escapeHtml(item.photoUrl)}"
+                alt="${escapeHtml(item.title)}"
+                class="w-16 h-16 rounded-xl object-cover shrink-0 bg-slate-800"
+              />
+              <div>
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white">${escapeHtml(item.title)}</h3>
+                <p class="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">${escapeHtml(item.shortDesc)}</p>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      lucide.createIcons();
+    }
+
+    // =========================================================================
+    // NAVEGACIÓN ENTRE VISTAS Y PESTAÑAS SUPERIORES
+    // =========================================================================
+    function updateTopNavHighlight(activeViewId) {
+      const desktopTabs = {
+        viewLogin: document.getElementById('navTabLogin'),
+        viewRamasInfo: document.getElementById('navTabRamas'),
+        viewAdmin: document.getElementById('navTabAdmin')
+      };
+      const mobileTabs = {
+        viewLogin: document.getElementById('mobTabLogin'),
+        viewRamasInfo: document.getElementById('mobTabRamas'),
+        viewAdmin: document.getElementById('mobTabAdmin')
+      };
+
+      Object.entries(desktopTabs).forEach(([id, el]) => {
+        if (!el) return;
+        if (id === activeViewId) {
+          el.className = 'py-5 border-b-2 border-blue-500 text-slate-900 dark:text-white font-semibold transition cursor-pointer';
+        } else {
+          el.className = 'py-5 border-b-2 border-transparent text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition cursor-pointer';
+        }
+      });
+
+      Object.entries(mobileTabs).forEach(([id, el]) => {
+        if (!el) return;
+        if (id === activeViewId) {
+          el.className = 'flex-1 py-2.5 border-b-2 border-blue-500 text-blue-600 dark:text-white text-center';
+        } else {
+          el.className = 'flex-1 py-2.5 border-b-2 border-transparent text-slate-500 dark:text-slate-400 text-center';
+        }
+      });
+    }
+
     function switchView(viewId) {
-      const views = ['viewLogin', 'viewTest', 'viewSelection', 'viewSuccess', 'viewAdmin'];
+      const views = ['viewLogin', 'viewRamasInfo', 'viewTest', 'viewSelection', 'viewSuccess', 'viewAdmin'];
       views.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.toggle('hidden', id !== viewId);
       });
+      updateTopNavHighlight(viewId);
       window.scrollTo({ top: 0, behavior: 'smooth' });
       lucide.createIcons();
     }
+
+    window.navigateTopTab = function(targetView) {
+      if (AppState.currentStudent && targetView !== 'viewTest' && targetView !== 'viewSelection') {
+        openConfirmModal(
+          'Salir del proceso actual',
+          'Tienes un test en curso. Si cambias de pestaña se perderá el avance no enviado. ¿Deseas salir?',
+          () => {
+            AppState.currentStudent = null;
+            if (targetView === 'viewRamasInfo') renderRamasShowcase();
+            switchView(targetView);
+          }
+        );
+        return;
+      }
+
+      if (targetView === 'viewLogin') renderLandingRamasPreview();
+      if (targetView === 'viewRamasInfo') renderRamasShowcase();
+      switchView(targetView);
+    };
+
+    window.focusStudentIdInput = function() {
+      navigateTopTab('viewLogin');
+      setTimeout(() => {
+        const input = document.getElementById('inputDocumento');
+        if (input) input.focus();
+      }, 150);
+    };
+
+    window.openAdminModalOrView = function() {
+      if (AppState.isAdminAuthenticated) {
+        renderAdminDashboard();
+        switchView('viewAdmin');
+        return;
+      }
+      document.getElementById('inputPinCheck').value = '';
+      document.getElementById('pinErrorMsg').classList.add('hidden');
+      document.getElementById('modalPin').classList.remove('hidden');
+      setTimeout(() => document.getElementById('inputPinCheck').focus(), 100);
+    };
 
     // =========================================================================
     // ETAPA 1: AUTENTICACIÓN DEL ESTUDIANTE
@@ -1477,7 +2186,7 @@
         const selectedVal = AppState.studentAnswers[q.id];
         const card = document.createElement('div');
         card.id = `q-card-${q.id}`;
-        card.className = `bg-slate-900/90 border ${selectedVal !== undefined ? 'border-emerald-500/40' : 'border-slate-800'} rounded-2xl p-4 sm:p-5 transition`;
+        card.className = `bg-white dark:bg-[#0b1222] border ${selectedVal !== undefined ? 'border-blue-500/50' : 'border-slate-200 dark:border-slate-800'} rounded-2xl p-4 sm:p-5 transition shadow-sm`;
 
         const options = [
           { label: 'Sí', value: 2 },
@@ -1488,15 +2197,15 @@
         card.innerHTML = `
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex items-start gap-3">
-              <span class="w-7 h-7 rounded-lg bg-slate-800 text-slate-300 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
+              <span class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
                 ${globalIndex + 1}
               </span>
-              <p class="text-sm sm:text-base font-medium text-slate-100 leading-snug">
+              <p class="text-sm sm:text-base font-medium text-slate-800 dark:text-slate-100 leading-snug">
                 ${escapeHtml(q.text)}
               </p>
             </div>
 
-            <div class="grid grid-cols-3 gap-2 shrink-0 md:w-80">
+            <div class="grid grid-cols-[0.8fr_1.4fr_0.8fr] sm:grid-cols-3 gap-1.5 sm:gap-2 shrink-0 md:w-80">
               ${options.map(opt => {
                 const isChecked = selectedVal === opt.value;
                 return `
@@ -1509,10 +2218,10 @@
                       ${isChecked ? 'checked' : ''}
                       onchange="handleSelectAnswer(${q.id}, ${opt.value})"
                     />
-                    <div class="text-center py-2.5 px-2 rounded-xl text-xs sm:text-sm font-semibold border transition select-none ${
+                    <div class="min-h-[44px] flex items-center justify-center text-center py-2 px-1.5 sm:px-2 rounded-xl text-xs sm:text-sm font-semibold border transition select-none leading-tight ${
                       isChecked
-                        ? 'bg-emerald-600 border-emerald-400 text-white shadow-md shadow-emerald-950/60'
-                        : 'bg-slate-950 border-slate-700/80 text-slate-300 hover:border-slate-500'
+                        ? 'bg-blue-600 border-blue-500 text-white shadow-md shadow-blue-950/40'
+                        : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-500'
                     }">
                       ${opt.label}
                     </div>
@@ -1537,11 +2246,11 @@
         const blockDone = slice.every(q => AppState.studentAnswers[q.id] !== undefined);
 
         if (i === tab) {
-          btn.className = 'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold border transition flex items-center justify-center gap-2 cursor-pointer bg-emerald-600/20 border-emerald-500 text-emerald-300';
+          btn.className = 'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold border transition flex items-center justify-center gap-2 cursor-pointer bg-blue-600/15 border-blue-500 text-blue-600 dark:text-blue-300';
         } else if (blockDone) {
-          btn.className = 'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold border transition flex items-center justify-center gap-2 cursor-pointer bg-slate-900 border-emerald-500/40 text-emerald-400';
+          btn.className = 'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold border transition flex items-center justify-center gap-2 cursor-pointer bg-emerald-500/10 border-emerald-500/40 text-emerald-600 dark:text-emerald-400';
         } else {
-          btn.className = 'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold border transition flex items-center justify-center gap-2 cursor-pointer bg-slate-950 border-slate-800 text-slate-400';
+          btn.className = 'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold border transition flex items-center justify-center gap-2 cursor-pointer bg-slate-100 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400';
         }
       }
 
@@ -1742,7 +2451,7 @@
         });
       });
       document.getElementById('selectionErrorMsg').classList.add('hidden');
-
+      renderRamasShowcase();
       switchView('viewSelection');
     });
 
@@ -1813,7 +2522,7 @@
       saveResults();
       const syncRes = await syncResultToSupabase(st.Numero_Identidad, finalRecord);
       if (!syncRes.ok) {
-        showToast('Guardado localmente, pero hubo un aviso al sincronizar con Supabase. Verifica las tablas en la nube.', 'warning');
+        showToast('Guardado localmente, pero hubo un aviso al sincronizar con Supabase.', 'warning');
       }
 
       document.getElementById('receiptName').textContent = st.Nombre_Completo;
@@ -1828,19 +2537,313 @@
 
     document.getElementById('btnFinishAndReset').addEventListener('click', () => {
       document.getElementById('inputDocumento').value = '';
+      renderLandingRamasPreview();
       switchView('viewLogin');
+    });
+
+    // =========================================================================
+    // GESTIÓN MULTIMEDIA EN PANEL DOCENTE (FOTOS Y VIDEOS DE YOUTUBE)
+    // =========================================================================
+    document.getElementById('btnToggleMediaEditor').addEventListener('click', () => {
+      const body = document.getElementById('mediaEditorBody');
+      const chevron = document.getElementById('mediaEditorChevron');
+      const isHidden = body.classList.toggle('hidden');
+      chevron.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
+      if (!isHidden) renderMediaEditorForm();
+    });
+
+    function renderMediaEditorForm() {
+      const grid = document.getElementById('mediaBranchesFormGrid');
+      if (!grid) return;
+
+      grid.innerHTML = DEFAULT_BRANCHES_CATALOG.map((base, idx) => {
+        const item = getBranchCatalogItem(base.key);
+        const safeKey = escapeHtml(base.key);
+        const hasVideo = Boolean(extractYouTubeEmbedUrl(item.youtubeUrl));
+
+        return `
+          <div class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <h4 class="text-sm font-bold text-slate-900 dark:text-white">${escapeHtml(base.title)}</h4>
+              ${hasVideo ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/15 text-rose-500 border border-rose-500/30">YouTube Activo</span>' : '<span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-200 dark:bg-slate-800 text-slate-500">Solo Foto</span>'}
+            </div>
+
+            <div class="relative h-28 w-full rounded-xl overflow-hidden bg-slate-800 border border-slate-300 dark:border-slate-700">
+              <img
+                id="previewImg_${idx}"
+                src="${escapeHtml(item.photoUrl)}"
+                alt="${escapeHtml(base.title)}"
+                class="w-full h-full object-cover"
+              />
+              <label class="absolute bottom-2 right-2 px-2.5 py-1 rounded-lg bg-slate-950/85 hover:bg-blue-600 text-white text-[11px] font-semibold cursor-pointer transition inline-flex items-center gap-1 shadow">
+                <i data-lucide="camera" class="w-3.5 h-3.5"></i>
+                <span>Subir Foto</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  class="hidden"
+                  onchange="handleBranchPhotoUpload(event, ${idx}, '${safeKey}')"
+                />
+              </label>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">URL de Fotografía (Vista 1)</label>
+              <input
+                type="text"
+                id="inputPhotoUrl_${idx}"
+                data-branch-key="${safeKey}"
+                value="${escapeHtml(item.photoUrl)}"
+                oninput="document.getElementById('previewImg_${idx}').src = this.value"
+                placeholder="https://..."
+                class="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white"
+              />
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">Enlace Video YouTube (Vista 2)</label>
+              <input
+                type="text"
+                id="inputYoutubeUrl_${idx}"
+                data-branch-key="${safeKey}"
+                value="${escapeHtml(item.youtubeUrl)}"
+                placeholder="https://www.youtube.com/watch?v=..."
+                class="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white"
+              />
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    window.handleBranchPhotoUpload = async function(event, idx, branchKey) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        showToast('Selecciona un archivo de imagen válido (JPG, PNG o WebP).', 'warning');
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        showToast('La imagen supera el límite de 10 MB. Elige una fotografía más ligera.', 'warning');
+        return;
+      }
+      try {
+        const compressedDataUrl = await compressImageFileToDataUrl(file, 720, 0.75);
+        document.getElementById(`inputPhotoUrl_${idx}`).value = compressedDataUrl;
+        document.getElementById(`previewImg_${idx}`).src = compressedDataUrl;
+        showToast(`Foto cargada para ${branchKey}. Haz clic en "Guardar Fotos y Videos en la Nube" para aplicarla.`, 'info');
+      } catch (err) {
+        showToast('No se pudo procesar la imagen seleccionada.', 'error');
+      }
+    };
+
+    document.getElementById('btnSaveBranchesMedia').addEventListener('click', async () => {
+      const updatedMedia = {};
+      DEFAULT_BRANCHES_CATALOG.forEach((base, idx) => {
+        const rawPhoto = document.getElementById(`inputPhotoUrl_${idx}`)?.value.trim() || base.photoUrl;
+        const photoVal = sanitizeImageUrl(rawPhoto, base.photoUrl);
+        const ytVal = document.getElementById(`inputYoutubeUrl_${idx}`)?.value.trim() || '';
+        updatedMedia[base.key] = {
+          photoUrl: photoVal,
+          youtubeUrl: ytVal
+        };
+      });
+
+      AppState.settings.branchesMedia = updatedMedia;
+      const syncRes = await saveSettings();
+      renderLandingRamasPreview();
+      renderRamasShowcase();
+      renderMediaEditorForm();
+
+      if (syncRes.ok) {
+        showToast('¡Fotos y videos de YouTube guardados y sincronizados en Supabase!', 'success');
+      } else if (syncRes.needsMediaColumn) {
+        showToast('Guardado en este equipo. Para sincronizar fotos/videos entre equipos, ejecuta en Supabase: ALTER TABLE public.orientacion_config ADD COLUMN IF NOT EXISTS media_config JSONB DEFAULT \'{}\'::jsonb;', 'warning');
+      } else {
+        showToast('Guardado localmente, pero hubo un aviso al sincronizar con Supabase.', 'warning');
+      }
+    });
+
+    document.getElementById('btnResetDefaultMedia').addEventListener('click', async () => {
+      AppState.settings.branchesMedia = {};
+      await saveSettings();
+      renderMediaEditorForm();
+      renderLandingRamasPreview();
+      renderRamasShowcase();
+      showToast('Fotos y videos restaurados a valores iniciales.', 'info');
+    });
+
+    // =========================================================================
+    // GESTIÓN CRUD DE ESTUDIANTES (AGREGAR, EDITAR, ELIMINAR, VACIAR BASE)
+    // =========================================================================
+    document.getElementById('btnOpenAddStudent').addEventListener('click', () => {
+      document.getElementById('studentModalTitle').innerHTML = `
+        <i data-lucide="user-plus" class="w-4 h-4 text-emerald-500"></i>
+        <span>Agregar Estudiante Nuevo</span>
+      `;
+      document.getElementById('editOriginalDocId').value = '';
+      document.getElementById('crudDocId').value = '';
+      document.getElementById('crudFullName').value = '';
+      document.getElementById('crudGrade').value = '8°';
+      document.getElementById('crudSection').value = '8°-1';
+      document.getElementById('modalStudentForm').classList.remove('hidden');
+      lucide.createIcons();
+      setTimeout(() => document.getElementById('crudDocId').focus(), 80);
+    });
+
+    window.openEditStudentModal = function(docId) {
+      const st = AppState.students.find(s => cleanId(s.Numero_Identidad) === docId);
+      if (!st) return;
+
+      document.getElementById('studentModalTitle').innerHTML = `
+        <i data-lucide="edit-3" class="w-4 h-4 text-blue-500"></i>
+        <span>Editar Datos del Estudiante</span>
+      `;
+      document.getElementById('editOriginalDocId').value = docId;
+      document.getElementById('crudDocId').value = docId;
+      document.getElementById('crudFullName').value = st.Nombre_Completo;
+      document.getElementById('crudGrade').value = st.Grado || '8°';
+      document.getElementById('crudSection').value = normalizeSection(st.Sección);
+      document.getElementById('modalStudentForm').classList.remove('hidden');
+      lucide.createIcons();
+    };
+
+    const closeStudentModal = () => {
+      document.getElementById('modalStudentForm').classList.add('hidden');
+    };
+    document.getElementById('btnCloseStudentModal').addEventListener('click', closeStudentModal);
+    document.getElementById('btnCancelStudentCRUD').addEventListener('click', closeStudentModal);
+
+    document.getElementById('formStudentCRUD').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const originalDocId = cleanId(document.getElementById('editOriginalDocId').value);
+      const newDocId = cleanId(document.getElementById('crudDocId').value);
+      const fullName = document.getElementById('crudFullName').value.trim();
+      const grade = document.getElementById('crudGrade').value.trim() || '8°';
+      const section = normalizeSection(document.getElementById('crudSection').value);
+
+      if (!newDocId || !fullName) {
+        showToast('Completa el Número de Identidad y el Nombre Completo.', 'warning');
+        return;
+      }
+
+      const btnSave = document.getElementById('btnSaveStudentCRUD');
+      btnSave.disabled = true;
+      btnSave.textContent = 'Guardando...';
+
+      const duplicate = AppState.students.find(s => cleanId(s.Numero_Identidad) === newDocId && cleanId(s.Numero_Identidad) !== originalDocId);
+      if (duplicate) {
+        btnSave.disabled = false;
+        btnSave.textContent = 'Guardar Estudiante';
+        showToast(`Ya existe otro estudiante registrado con el documento ${newDocId} (${duplicate.Nombre_Completo}).`, 'error');
+        return;
+      }
+
+      if (originalDocId) {
+        const idx = AppState.students.findIndex(s => cleanId(s.Numero_Identidad) === originalDocId);
+        if (idx !== -1) {
+          AppState.students[idx] = {
+            Numero_Identidad: newDocId,
+            Nombre_Completo: fullName,
+            Grado: grade,
+            Sección: section
+          };
+        }
+
+        if (originalDocId !== newDocId) {
+          if (AppState.results[originalDocId]) {
+            const migrated = {
+              ...AppState.results[originalDocId],
+              Numero_Identidad: newDocId,
+              Nombre_Completo: fullName,
+              Grado: grade,
+              Sección: section
+            };
+            delete AppState.results[originalDocId];
+            AppState.results[newDocId] = migrated;
+            saveResults();
+            await deleteStudentFromSupabase(originalDocId);
+            await saveStudents();
+            await syncResultToSupabase(newDocId, migrated);
+          } else {
+            await deleteStudentFromSupabase(originalDocId);
+            await saveStudents();
+          }
+        } else {
+          if (AppState.results[newDocId]) {
+            AppState.results[newDocId].Nombre_Completo = fullName;
+            AppState.results[newDocId].Grado = grade;
+            AppState.results[newDocId].Sección = section;
+            saveResults();
+            await syncResultToSupabase(newDocId, AppState.results[newDocId]);
+          }
+          await saveStudents();
+        }
+        showToast(`Datos de ${fullName} actualizados y sincronizados en la nube.`, 'success');
+      } else {
+        AppState.students.push({
+          Numero_Identidad: newDocId,
+          Nombre_Completo: fullName,
+          Grado: grade,
+          Sección: section
+        });
+        await saveStudents();
+        showToast(`Estudiante ${fullName} agregado y sincronizado en la nube.`, 'success');
+      }
+
+      btnSave.disabled = false;
+      btnSave.textContent = 'Guardar Estudiante';
+      closeStudentModal();
+      renderAdminDashboard();
+    });
+
+    window.deleteStudentRecord = function(docId) {
+      const st = AppState.students.find(s => cleanId(s.Numero_Identidad) === docId);
+      if (!st) return;
+      const hasCompleted = Boolean(AppState.results[docId]?.completed);
+
+      openConfirmModal(
+        'Eliminar estudiante de la base de datos',
+        hasCompleted
+          ? `ATENCIÓN: ${st.Nombre_Completo} (ID: ${docId}) ya respondió el test vocacional. Si lo eliminas, se borrarán tanto su matrícula como sus respuestas en este equipo y en Supabase. ¿Deseas continuar?`
+          : `¿Deseas eliminar a ${st.Nombre_Completo} (ID: ${docId}) de la base de datos en este equipo y en Supabase?`,
+        async () => {
+          AppState.students = AppState.students.filter(s => cleanId(s.Numero_Identidad) !== docId);
+          delete AppState.results[docId];
+          localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(AppState.students));
+          saveResults();
+          await deleteStudentFromSupabase(docId);
+          renderAdminDashboard();
+          showToast(`Estudiante ${st.Nombre_Completo} eliminado correctamente.`, 'info');
+        }
+      );
+    };
+
+    document.getElementById('btnWipeDatabase').addEventListener('click', () => {
+      openConfirmModal(
+        'Vaciar toda la Base de Datos (Nube + Local)',
+        'Esta acción eliminará TODOS los estudiantes importados y sus respuestas tanto en este navegador como en Supabase, dejándola lista para cargar un nuevo archivo Excel limpio. ¿Estás seguro?',
+        async () => {
+          AppState.students = [];
+          AppState.results = {};
+          localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify([]));
+          saveResults();
+          const res = await wipeAllDatabaseFromSupabase();
+          renderAdminDashboard();
+          if (res.ok) {
+            showToast('Base de datos vaciada en este equipo y en Supabase. Ya puedes importar tu nuevo Excel.', 'success');
+          } else {
+            showToast('Se vació en este equipo, pero hubo un aviso al limpiar Supabase.', 'warning');
+          }
+        }
+      );
     });
 
     // =========================================================================
     // PANEL ADMINISTRATIVO DOCENTE (PIN, EXCEL, CONTRASTE, EXPORTACIÓN)
     // =========================================================================
-    document.getElementById('btnOpenAdmin').addEventListener('click', () => {
-      document.getElementById('inputPinCheck').value = '';
-      document.getElementById('pinErrorMsg').classList.add('hidden');
-      document.getElementById('modalPin').classList.remove('hidden');
-      setTimeout(() => document.getElementById('inputPinCheck').focus(), 100);
-    });
-
     document.getElementById('btnClosePinModal').addEventListener('click', () => {
       document.getElementById('modalPin').classList.add('hidden');
     });
@@ -1863,6 +2866,7 @@
         return;
       }
 
+      AppState.isAdminAuthenticated = true;
       document.getElementById('modalPin').classList.add('hidden');
       document.getElementById('inputSupabaseUrl').value = AppState.settings.supabaseUrl || '';
       document.getElementById('inputSupabaseKey').value = AppState.settings.supabaseKey || '';
@@ -1874,6 +2878,7 @@
     });
 
     document.getElementById('btnCloseAdmin').addEventListener('click', () => {
+      renderLandingRamasPreview();
       switchView('viewLogin');
     });
 
@@ -1882,10 +2887,12 @@
       document.getElementById('inputNewPin').value = AppState.settings.pin || '1234';
       document.getElementById('inputMaxQuota').value = AppState.settings.maxQuota || 35;
       renderAdminDashboard();
+      renderLandingRamasPreview();
+      renderRamasShowcase();
       if (ok) {
         showToast('Datos y configuración sincronizados desde la nube Supabase.', 'success');
       } else {
-        showToast('No se pudieron descargar datos de Supabase. Revisa que hayas ejecutado el script SQL.', 'warning');
+        showToast('No se pudieron descargar datos de Supabase. Revisa la conexión.', 'warning');
       }
     });
 
@@ -1991,13 +2998,13 @@
 
         const extraMsg = skippedRows > 0 ? ` (${skippedRows} filas incompletas omitidas)` : '';
         if (syncResult && syncResult.ok) {
-          showToast(`¡Listo! Se cargaron y sincronizaron en la nube ${addedOrUpdated} estudiantes${extraMsg}. Ya son visibles en todos los dispositivos.`, 'success');
+          showToast(`¡Listo! Se cargaron y sincronizaron en la nube ${addedOrUpdated} estudiantes${extraMsg}.`, 'success');
         } else {
           showToast(`Se cargaron ${addedOrUpdated} estudiantes localmente, pero Supabase devolvió error: ${syncResult?.error || 'verifica las tablas'}`, 'error');
         }
       } catch (err) {
         console.error(err);
-        showToast('Error al leer el archivo Excel. Verifica que no esté dañado o protegido con contraseña.', 'error');
+        showToast('Error al leer el archivo Excel.', 'error');
       }
       e.target.value = '';
     });
@@ -2008,6 +3015,7 @@
       e.target.value = AppState.settings.maxQuota;
       await saveSettings();
       renderAdminDashboard();
+      renderRamasShowcase();
     });
 
     document.getElementById('btnSmartDistribute').addEventListener('click', async () => {
@@ -2069,9 +3077,7 @@
       });
 
       saveResults();
-      for (const r of completedList) {
-        await syncResultToSupabase(r.Numero_Identidad, r);
-      }
+      await syncResultsBatchToSupabase(completedList);
       renderAdminDashboard();
 
       const assignedTotal = completedList.filter(r => r.assignedRama !== 'Por definir (Revisar)').length;
@@ -2156,14 +3162,14 @@
         return `
           <div class="space-y-1">
             <div class="flex justify-between text-xs">
-              <span class="font-semibold text-slate-200">${cat.label}</span>
-              <span class="text-slate-400">Directa: <strong class="text-sky-400">${directCount}</strong> (${directPct}%) • Test: <strong class="text-emerald-400">${testCount}</strong> (${testPct}%)</span>
+              <span class="font-semibold text-slate-800 dark:text-slate-200">${cat.label}</span>
+              <span class="text-slate-500 dark:text-slate-400">Directa: <strong class="text-blue-600 dark:text-sky-400">${directCount}</strong> (${directPct}%) • Test: <strong class="text-emerald-600 dark:text-emerald-400">${testCount}</strong> (${testPct}%)</span>
             </div>
             <div class="space-y-1">
-              <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
-                <div class="h-full bg-sky-500 transition-all duration-500" style="width: ${directPct}%"></div>
+              <div class="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div class="h-full bg-blue-500 transition-all duration-500" style="width: ${directPct}%"></div>
               </div>
-              <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div class="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                 <div class="h-full bg-emerald-500 transition-all duration-500" style="width: ${testPct}%"></div>
               </div>
             </div>
@@ -2193,7 +3199,7 @@
       const maxQuota = AppState.settings.maxQuota || 35;
       const distMap = {
         'Agropecuaria': { countId: 'distAgro', badgeId: 'quotaBadgeAgro', barId: 'barQuotaAgro', color: 'bg-emerald-500' },
-        'Comercial': { countId: 'distComercial', badgeId: 'quotaBadgeComercial', barId: 'barQuotaComercial', color: 'bg-sky-500' },
+        'Comercial': { countId: 'distComercial', badgeId: 'quotaBadgeComercial', barId: 'barQuotaComercial', color: 'bg-blue-500' },
         'Industrial - Metalmecánica': { countId: 'distMetal', badgeId: 'quotaBadgeMetal', barId: 'barQuotaMetal', color: 'bg-amber-500' },
         'Industrial - Electricidad': { countId: 'distElec', badgeId: 'quotaBadgeElec', barId: 'barQuotaElec', color: 'bg-orange-500' },
         'Promoción Social': { countId: 'distSocial', badgeId: 'quotaBadgeSocial', barId: 'barQuotaSocial', color: 'bg-rose-500' }
@@ -2205,7 +3211,7 @@
         document.getElementById(ui.countId).textContent = count;
         const badgeEl = document.getElementById(ui.badgeId);
         badgeEl.textContent = `${count} / ${maxQuota}`;
-        badgeEl.className = `text-[11px] font-bold ${count > maxQuota ? 'text-rose-400' : count >= maxQuota * 0.85 ? 'text-amber-400' : 'text-slate-400'}`;
+        badgeEl.className = `text-[11px] font-bold ${count > maxQuota ? 'text-rose-500' : count >= maxQuota * 0.85 ? 'text-amber-500' : 'text-slate-500 dark:text-slate-400'}`;
 
         const barEl = document.getElementById(ui.barId);
         barEl.style.width = `${pct}%`;
@@ -2219,6 +3225,7 @@
       const searchFilter = document.getElementById('filterSearch').value.trim().toLowerCase();
 
       const tbody = document.getElementById('adminTableBody');
+      const mobileCards = document.getElementById('adminMobileCards');
       const filteredStudents = AppState.students.filter(st => {
         const docId = cleanId(st.Numero_Identidad);
         const res = AppState.results[docId];
@@ -2240,11 +3247,18 @@
       if (filteredStudents.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="8" class="py-8 text-center text-slate-400">
-              No hay estudiantes que coincidan con los filtros seleccionados.
+            <td colspan="8" class="py-8 text-center text-slate-500 dark:text-slate-400">
+              No hay estudiantes registrados o que coincidan con los filtros seleccionados.
             </td>
           </tr>
         `;
+        if (mobileCards) {
+          mobileCards.innerHTML = `
+            <div class="p-6 text-center text-xs text-slate-500 dark:text-slate-400">
+              No hay estudiantes registrados o que coincidan con los filtros seleccionados.
+            </div>
+          `;
+        }
         return;
       }
 
@@ -2257,21 +3271,141 @@
         'Promoción Social'
       ];
 
+      if (mobileCards) {
+        mobileCards.innerHTML = filteredStudents.map(st => {
+          const docId = cleanId(st.Numero_Identidad);
+          const res = AppState.results[docId];
+          const sec = normalizeSection(st.Sección);
+
+          const actionsMobile = `
+            <div class="flex items-center gap-1.5">
+              <button
+                type="button"
+                onclick="openEditStudentModal('${escapeHtml(docId)}')"
+                class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
+                title="Editar"
+              >
+                <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+              </button>
+              <button
+                type="button"
+                onclick="deleteStudentRecord('${escapeHtml(docId)}')"
+                class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-rose-500 border border-slate-200 dark:border-slate-700"
+                title="Eliminar"
+              >
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          `;
+
+          if (!res || !res.completed) {
+            return `
+              <div class="p-4 flex items-center justify-between gap-3">
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[11px] font-bold text-slate-700 dark:text-slate-300">${escapeHtml(sec)}</span>
+                    <span class="text-[11px] text-slate-500">ID: ${escapeHtml(docId)}</span>
+                  </div>
+                  <p class="font-bold text-sm text-slate-900 dark:text-white truncate mt-1">${escapeHtml(st.Nombre_Completo)}</p>
+                  <p class="text-xs text-amber-600 dark:text-amber-400 italic mt-0.5">Pendiente por presentar</p>
+                </div>
+                ${actionsMobile}
+              </div>
+            `;
+          }
+
+          const s = res.test.scores;
+          const assigned = res.assignedRama || (res.coincidence === 'Coincide' ? res.selection.option1 : 'Por definir (Revisar)');
+
+          return `
+            <div class="p-4 space-y-3">
+              <div class="flex items-start justify-between gap-2">
+                <div class="min-w-0">
+                  <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[11px] font-bold text-slate-700 dark:text-slate-300">${escapeHtml(sec)}</span>
+                    <span class="text-[11px] text-slate-500">ID: ${escapeHtml(docId)}</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${res.coincidence === 'Coincide' ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300' : 'bg-rose-500/20 text-rose-700 dark:text-rose-300'}">
+                      ${escapeHtml(res.coincidence)}
+                    </span>
+                  </div>
+                  <p class="font-bold text-sm text-slate-900 dark:text-white mt-1">${escapeHtml(st.Nombre_Completo)}</p>
+                </div>
+                ${actionsMobile}
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 text-[11px] bg-slate-50 dark:bg-slate-950 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800">
+                <div>
+                  <span class="text-slate-500 block">Sugerida (Test):</span>
+                  <strong class="text-slate-900 dark:text-white">${escapeHtml(res.test.suggestedRama)}</strong>
+                  <span class="block text-[10px] text-slate-500">A:${s.Agropecuaria} C:${s.Comercial} I:${s.Industrial} S:${s['Promoción Social']}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block">Selección Directa:</span>
+                  <strong class="text-emerald-600 dark:text-emerald-400">1ª: ${escapeHtml(res.selection.option1)}</strong>
+                  <span class="block text-[10px] text-slate-500">2ª: ${escapeHtml(res.selection.option2)}</span>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <select
+                  onchange="updateAssignedRama('${escapeHtml(docId)}', this.value)"
+                  class="flex-1 min-w-[170px] px-2.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border ${assigned === 'Por definir (Revisar)' ? 'border-amber-500/60 text-amber-600 dark:text-amber-300' : 'border-emerald-500/50 text-emerald-600 dark:text-emerald-300'} text-xs font-semibold"
+                >
+                  ${ramaOptions.map(opt => `<option value="${escapeHtml(opt)}" ${assigned === opt ? 'selected' : ''}>${escapeHtml(opt)}</option>`).join('')}
+                </select>
+
+                <button
+                  type="button"
+                  onclick="openActaModal('${escapeHtml(docId)}')"
+                  class="px-3 py-2 rounded-xl bg-blue-600/15 text-blue-600 dark:text-sky-300 border border-blue-500/40 text-xs font-semibold inline-flex items-center gap-1"
+                >
+                  <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                  <span>Acta</span>
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
       tbody.innerHTML = filteredStudents.map(st => {
         const docId = cleanId(st.Numero_Identidad);
         const res = AppState.results[docId];
         const sec = normalizeSection(st.Sección);
 
+        const crudButtonsHtml = `
+          <div class="inline-flex items-center justify-end gap-1">
+            <button
+              type="button"
+              onclick="openEditStudentModal('${escapeHtml(docId)}')"
+              class="p-1.5 rounded-lg bg-slate-100 hover:bg-blue-100 dark:bg-slate-800 dark:hover:bg-blue-900/70 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 border border-slate-200 dark:border-slate-700 transition cursor-pointer"
+              title="Editar datos del estudiante"
+            >
+              <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+            </button>
+            <button
+              type="button"
+              onclick="deleteStudentRecord('${escapeHtml(docId)}')"
+              class="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-100 dark:bg-slate-800 dark:hover:bg-rose-950 text-slate-600 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 border border-slate-200 dark:border-slate-700 transition cursor-pointer"
+              title="Eliminar estudiante de la base de datos"
+            >
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        `;
+
         if (!res || !res.completed) {
           return `
-            <tr class="hover:bg-slate-800/40 transition">
+            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
               <td class="py-3 px-4">
-                <p class="font-semibold text-white">${escapeHtml(st.Nombre_Completo)}</p>
-                <p class="text-[11px] text-slate-400">ID: ${escapeHtml(docId)}</p>
+                <p class="font-semibold text-slate-900 dark:text-white">${escapeHtml(st.Nombre_Completo)}</p>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400">ID: ${escapeHtml(docId)}</p>
               </td>
-              <td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300">${escapeHtml(sec)}</span></td>
-              <td colspan="5" class="py-3 px-3 text-amber-400/90 italic">Pendiente por presentar el instrumento</td>
-              <td class="py-3 px-3 text-right text-slate-500">—</td>
+              <td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">${escapeHtml(sec)}</span></td>
+              <td colspan="5" class="py-3 px-3 text-amber-600 dark:text-amber-400/90 italic">Pendiente por presentar el instrumento</td>
+              <td class="py-3 px-3 text-right">
+                ${crudButtonsHtml}
+              </td>
             </tr>
           `;
         }
@@ -2282,61 +3416,64 @@
         const assigned = res.assignedRama || (res.coincidence === 'Coincide' ? res.selection.option1 : 'Por definir (Revisar)');
 
         return `
-          <tr class="hover:bg-slate-800/40 transition align-top">
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition align-top">
             <td class="py-3 px-4">
-              <p class="font-semibold text-white">${escapeHtml(st.Nombre_Completo)}</p>
-              <p class="text-[11px] text-slate-400">ID: ${escapeHtml(docId)}</p>
-              ${res.test.isFlatPattern ? `<span class="inline-block mt-1 px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 text-[10px]">Alerta: ${escapeHtml(res.test.flatOptionLabel)}</span>` : ''}
+              <p class="font-semibold text-slate-900 dark:text-white">${escapeHtml(st.Nombre_Completo)}</p>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">ID: ${escapeHtml(docId)}</p>
+              ${res.test.isFlatPattern ? `<span class="inline-block mt-1 px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-600 dark:text-rose-300 border border-rose-500/40 text-[10px]">Alerta: ${escapeHtml(res.test.flatOptionLabel)}</span>` : ''}
             </td>
-            <td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300">${escapeHtml(sec)}</span></td>
+            <td class="py-3 px-3"><span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">${escapeHtml(sec)}</span></td>
             <td class="py-3 px-3 space-y-0.5 text-[11px]">
-              <div>Agro: <strong class="text-emerald-300">${s.Agropecuaria}</strong> • Com: <strong class="text-sky-300">${s.Comercial}</strong></div>
-              <div>Ind: <strong class="text-amber-300">${s.Industrial}</strong> <span class="text-slate-400">(Met ${metalPct}% / Elec ${elecPct}%)</span></div>
-              <div>Social: <strong class="text-rose-300">${s['Promoción Social']}</strong></div>
+              <div>Agro: <strong class="text-emerald-600 dark:text-emerald-300">${s.Agropecuaria}</strong> • Com: <strong class="text-blue-600 dark:text-sky-300">${s.Comercial}</strong></div>
+              <div>Ind: <strong class="text-amber-600 dark:text-amber-300">${s.Industrial}</strong> <span class="text-slate-500 dark:text-slate-400">(Met ${metalPct}% / Elec ${elecPct}%)</span></div>
+              <div>Social: <strong class="text-rose-600 dark:text-rose-300">${s['Promoción Social']}</strong></div>
             </td>
             <td class="py-3 px-3">
-              <p class="font-bold text-white">${escapeHtml(res.test.suggestedRama)}</p>
-              <span class="inline-block mt-0.5 px-2 py-0.5 rounded-full text-[10px] ${res.test.profileType === 'Interés claro' ? 'bg-emerald-500/15 text-emerald-300' : 'bg-amber-500/15 text-amber-300'}">
+              <p class="font-bold text-slate-900 dark:text-white">${escapeHtml(res.test.suggestedRama)}</p>
+              <span class="inline-block mt-0.5 px-2 py-0.5 rounded-full text-[10px] ${res.test.profileType === 'Interés claro' ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300' : 'bg-amber-500/15 text-amber-700 dark:text-amber-300'}">
                 ${escapeHtml(res.test.profileType)}
               </span>
             </td>
             <td class="py-3 px-3 space-y-0.5 text-[11px]">
-              <p><strong class="text-emerald-400">1ª:</strong> ${escapeHtml(res.selection.option1)}</p>
-              <p><strong class="text-sky-400">2ª:</strong> ${escapeHtml(res.selection.option2)}</p>
-              <p><strong class="text-amber-400">3ª:</strong> ${escapeHtml(res.selection.option3)}</p>
+              <p><strong class="text-emerald-600 dark:text-emerald-400">1ª:</strong> ${escapeHtml(res.selection.option1)}</p>
+              <p><strong class="text-blue-600 dark:text-sky-400">2ª:</strong> ${escapeHtml(res.selection.option2)}</p>
+              <p><strong class="text-amber-600 dark:text-amber-400">3ª:</strong> ${escapeHtml(res.selection.option3)}</p>
             </td>
             <td class="py-3 px-3 space-y-1">
-              <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold ${res.coincidence === 'Coincide' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'}">
+              <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold ${res.coincidence === 'Coincide' ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/40' : 'bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-500/40'}">
                 ${escapeHtml(res.coincidence)}
               </span>
-              <p class="text-[10px] text-slate-400">Control: ${res.test.controlErrors} err • Reinicios: ${res.test.failedAttempts}</p>
-              <p class="text-[10px] text-slate-400 italic max-w-[180px] truncate" title="${escapeHtml(res.test.reflection)}">"${escapeHtml(res.test.reflection)}"</p>
+              <p class="text-[10px] text-slate-500 dark:text-slate-400">Control: ${res.test.controlErrors} err • Reinicios: ${res.test.failedAttempts}</p>
+              <p class="text-[10px] text-slate-500 dark:text-slate-400 italic max-w-[180px] truncate" title="${escapeHtml(res.test.reflection)}">"${escapeHtml(res.test.reflection)}"</p>
             </td>
             <td class="py-3 px-3">
               <select
                 onchange="updateAssignedRama('${escapeHtml(docId)}', this.value)"
-                class="px-2.5 py-1.5 rounded-lg bg-slate-950 border ${assigned === 'Por definir (Revisar)' ? 'border-amber-500/60 text-amber-300' : 'border-emerald-500/50 text-emerald-300'} text-[11px] font-semibold focus:outline-none"
+                class="px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-950 border ${assigned === 'Por definir (Revisar)' ? 'border-amber-500/60 text-amber-600 dark:text-amber-300' : 'border-emerald-500/50 text-emerald-600 dark:text-emerald-300'} text-[11px] font-semibold focus:outline-none"
               >
                 ${ramaOptions.map(opt => `<option value="${escapeHtml(opt)}" ${assigned === opt ? 'selected' : ''}>${escapeHtml(opt)}</option>`).join('')}
               </select>
             </td>
             <td class="py-3 px-3 text-right space-y-1.5">
-              <button
-                type="button"
-                onclick="openActaModal('${escapeHtml(docId)}')"
-                class="px-2.5 py-1 rounded-lg bg-sky-600/20 hover:bg-sky-600/40 text-sky-300 border border-sky-500/40 text-[11px] font-semibold transition inline-flex items-center gap-1 cursor-pointer"
-                title="Generar Acta Imprimible / PDF"
-              >
-                <i data-lucide="printer" class="w-3 h-3"></i>
-                <span>Acta</span>
-              </button>
+              <div class="flex items-center justify-end gap-1">
+                <button
+                  type="button"
+                  onclick="openActaModal('${escapeHtml(docId)}')"
+                  class="px-2 py-1 rounded-lg bg-blue-600/15 hover:bg-blue-600/30 text-blue-600 dark:text-sky-300 border border-blue-500/40 text-[11px] font-semibold transition inline-flex items-center gap-1 cursor-pointer"
+                  title="Generar Acta Imprimible / PDF"
+                >
+                  <i data-lucide="printer" class="w-3 h-3"></i>
+                  <span>Acta</span>
+                </button>
+                ${crudButtonsHtml}
+              </div>
               <button
                 type="button"
                 onclick="resetStudentAttempt('${escapeHtml(docId)}')"
-                class="block ml-auto px-2 py-1 rounded-lg bg-slate-800 hover:bg-rose-950 text-slate-400 hover:text-rose-300 text-[10px] transition cursor-pointer"
-                title="Permitir que el estudiante vuelva a realizar el test"
+                class="block ml-auto px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800/80 hover:bg-amber-100 dark:hover:bg-amber-950 text-slate-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-300 text-[10px] transition cursor-pointer"
+                title="Borrar solo el intento para que vuelva a responder"
               >
-                Reiniciar
+                Reiniciar test
               </button>
             </td>
           </tr>
@@ -2459,11 +3596,7 @@
       AppState.students = Array.from(studentMap.values());
       await saveStudents();
       saveResults();
-      for (const [docId, rec] of Object.entries(AppState.results)) {
-        if (rec && rec.completed) {
-          await syncResultToSupabase(docId, rec);
-        }
-      }
+      await syncResultsBatchToSupabase(Object.values(AppState.results));
       renderAdminDashboard();
       showToast(`Fusión finalizada: ${mergedCount} registros nuevos integrados (${skippedCount} omitidos por ya existir).`, 'success');
       e.target.value = '';
@@ -2573,15 +3706,31 @@
 
     document.getElementById('btnClearAllData').addEventListener('click', () => {
       openConfirmModal(
-        'Borrar resultados y reiniciar base local',
-        'Esta acción eliminará todas las respuestas de estudiantes almacenadas en este navegador. Si también deseas borrar la lista de matriculados, vuelve a importar tu Excel después. ¿Deseas continuar?',
-        () => {
+        'Reiniciar respuestas del test (Nube + Local)',
+        'Esta acción eliminará únicamente las respuestas de los estudiantes tanto en este navegador como en Supabase, conservando la lista de estudiantes matriculados. ¿Deseas continuar?',
+        async () => {
           AppState.results = {};
           saveResults();
+          const res = await wipeOnlyResultsFromSupabase();
           renderAdminDashboard();
-          showToast('Todos los resultados locales han sido eliminados.', 'warning');
+          if (res.ok) {
+            showToast('Las respuestas han sido reiniciadas en local y en Supabase.', 'warning');
+          } else {
+            showToast('Respuestas reiniciadas localmente, pero hubo un aviso al limpiar Supabase.', 'warning');
+          }
         }
       );
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        ['modalPin', 'modalStudentForm', 'modalConfirm', 'printableActaModal'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el && !el.classList.contains('hidden')) {
+            el.classList.add('hidden');
+          }
+        });
+      }
     });
 
     window.addEventListener('beforeunload', (e) => {
@@ -2598,10 +3747,3 @@
   </script>
 </body>
 </html>
-```
-
-### Pasos para aplicar esta corrección:
-1. Reemplaza el `index.html` en tu repositorio de GitHub con este código actualizado.
-2. Espera 1 minuto a que GitHub Pages actualice la página y recarga con `Ctrl + Shift + R`.
-3. Verás que arriba a la derecha ahora aparece en azul/verde **`Nube Supabase Conectada`**.
-4. Haz clic una sola vez en **Guardar Configuración** (con tu PIN `1023`) y vuelve a cargar tu archivo Excel de los **146 estudiantes**: esta vez se subirán de inmediato a Supabase y aparecerán automáticamente en tu otro computador y celular.
